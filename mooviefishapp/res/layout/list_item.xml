@@ -4,9 +4,10 @@
     android:layout_height="fill_parent" >
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/image"
+        android:paddingTop="20dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp" />
  
@@ -16,8 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/icon"
         android:paddingBottom="10dp"
-        android:textColor="#CC0033"
-        android:textSize="16dp" />
+        android:textColor="#FFFFFF"
+        android:textSize="20dp" />
  
     <TextView
         android:id="@+id/desc"
@@ -26,6 +27,7 @@
         android:layout_below="@+id/title"
         android:layout_toRightOf="@+id/icon"
         android:paddingLeft="10dp"
+        android:paddingBottom="10dp"
         android:textColor="#3399FF"
         android:textSize="14dp" />
 </RelativeLayout>
