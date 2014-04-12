@@ -88,5 +88,5 @@
     -->
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
-
+    <target name="all" depends="debug" description="Build android application." />
 </project>
