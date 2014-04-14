@@ -55,6 +55,8 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AmatchMovieActivity extends Activity implements
         OnItemClickListener {
@@ -65,6 +67,7 @@ public class AmatchMovieActivity extends Activity implements
 	private String track_keys_fn = null;
 	private String translation_fn = null;
     private int movie_position = -1;
+    private MovieItem selectedMovie = null;
     private TextView    mv_progress_display_view;
     private SeekBar     mv_seekbar;
 	private TextView    mv_title_view;
@@ -80,9 +83,6 @@ public class AmatchMovieActivity extends Activity implements
         TAG = gs.getTAG();
 
         setContentView(R.layout.movie_view);
-        movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
-
-        Log.d(TAG,"AmatchMovieActivity.onCreate() movie_position: " + movie_position);
         
         mv_seekbar = (SeekBar)findViewById(R.id.mv_seekbar);
         mv_seekbar.setClickable(false);
@@ -94,14 +94,29 @@ public class AmatchMovieActivity extends Activity implements
         
         mv_list_view = (ListView) findViewById(R.id.mv_list);
             
-        String[] langs = new String[] { "Russian/Русский", "Hebrew/יברית" }; 
+        movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
+        Log.d(TAG,"AmatchMovieActivity.onCreate() movie_position: " + movie_position);
+        
+        List<String> langs = new ArrayList<String>();
+
+        if(movie_position != -1) {
+            selectedMovie = gs.movieItems.get(movie_position);
+            int sz = selectedMovie.translations.size();
+            for(int i=0; i<sz; i++)
+            {
+                langs.add(selectedMovie.translations.get(i).title);
+            }
+        }
+        
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
               android.R.layout.simple_list_item_1, android.R.id.text1, langs);
         mv_list_view.setAdapter(adapter); 
         mv_list_view.setOnItemClickListener(this);
-		
-        mv_title_view.setText("Movie Title");
-
+		if(selectedMovie == null) {
+            mv_title_view.setText("Movie Title");
+        } else {
+            mv_title_view.setText(selectedMovie.title);
+        }
 		mv_btn_start_search.setEnabled(false);
 		mv_found_display_view.setText("");
 

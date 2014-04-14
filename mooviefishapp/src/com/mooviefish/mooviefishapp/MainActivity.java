@@ -30,7 +30,7 @@ public class MainActivity extends Activity  implements
     private final String test_id = "test";
 
     ListView listView;
-    List<MovieItem> movieItems;
+
 
 
     /** Called when the activity is first created. */
@@ -45,11 +45,11 @@ public class MainActivity extends Activity  implements
         setContentView(R.layout.main);
         Log.d(TAG, "onCreate(): root_path: " + gs.getRootPath());
         
-        createMovieItems();
+        gs.createMovieItems();
         
         listView = (ListView) findViewById(R.id.list);
         CustomListViewAdapter adapter = new CustomListViewAdapter(this,
-                R.layout.list_item, movieItems);
+                R.layout.list_item, gs.movieItems);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
   
@@ -58,7 +58,7 @@ public class MainActivity extends Activity  implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
-    	MovieItem r = movieItems.get(position);
+    	MovieItem r = gs.movieItems.get(position);
         Log.d(TAG,"MainActivity.onItemClick() position: " + position + " id: " + r.id);
     	if( test_id.equals(r.id) ) {
             Log.d(TAG,"MainActivity.onItemClick() test case");
@@ -74,52 +74,4 @@ public class MainActivity extends Activity  implements
         }
     }
 
-    public void createMovieItems() {
-    	JSONArray jsonarray = getJSONFromUrl("");
-
-        movieItems = new ArrayList<MovieItem>();
-        
-        try {
-            for(int i=0;i<jsonarray.length();i++)
-            {
-                JSONObject c=jsonarray.getJSONObject(i);// Used JSON Object from Android
-                //Storing each Json in a string variable
-                String ID 	=c.getString("id");
-                String TITLE=c.getString("title");
-                String DESC =c.getString("desc");
-                String IMG  = gs.getRootPath() + ID + "/" + c.getString("img");
-                Log.d(TAG,"IMG:" + IMG);
-                movieItems.add(new MovieItem(ID,TITLE,DESC,IMG));
-            }
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
- 	}
-
-    public JSONArray getJSONFromUrl(String url) {
-    	JSONArray jsonarr=null;
-    	String json = "";
-    	String json_fn = gs.getRootPath() + "movie_list.json";
-    	try{
-    	// Making HTTP request
-    	
-    	Log.d(TAG, "json_fn: " + json_fn);
-    	json = gs.getStringFromFile(json_fn);
-    	Log.d(TAG, "json: " + json);
-    	} catch(Exception e) {
-    		Log.d(TAG,"Failed read json: " + json_fn);
-    		//return null;
-            json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\"}]";
-    	} 
-    	// try parse the string to a JSONArray
-    	try {
-    		jsonarr = new JSONArray(json);
-    	} catch (JSONException e) {
-    		Log.d(TAG,"Failed parse json: " + json_fn);
-    	}
-
-    // return JSON String
-    return jsonarr;  //<<<< return JSONArray instead of JSONObject
-}
 }

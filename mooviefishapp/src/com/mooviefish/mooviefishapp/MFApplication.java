@@ -9,7 +9,12 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import android.os.Environment;
 import android.app.Application;
- 
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
+import android.util.Log; 
 /**
 * This is a global state for MoovieFishApp
 *
@@ -30,6 +35,9 @@ public class MFApplication extends Application
 	public static final String appVersion = "0.2"; 
 	private static final String TAG = "MoovieFishApp";
 	private final String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
+
+	List<MovieItem> movieItems;
+
 	public String getTAG() {
 		return TAG;
 	}
@@ -56,5 +64,70 @@ public class MFApplication extends Application
 		fin.close();        
 		return ret;
 	}
+
+    public void createMovieItems() {
+    	JSONArray jsonarray = getJSONFromUrl("");
+
+        movieItems = new ArrayList<MovieItem>();
+        
+        try {
+            for(int i=0;i<jsonarray.length();i++)
+            {
+                JSONObject c=jsonarray.getJSONObject(i);// Used JSON Object from Android
+                //Storing each Json in a string variable
+                String ID 	=c.getString("id");
+                String TITLE=c.getString("title");
+                String DESC =c.getString("desc");
+                String IMG  = getRootPath() + ID + "/" + c.getString("img");
+                Log.d(TAG,"JSON Parser IMG:" + IMG);
+                MovieItem mi = new MovieItem(ID,TITLE,DESC,IMG);
+
+                JSONArray trans_jsonarray = c.getJSONArray("translations");
+                Log.d(TAG,"trans: " + trans_jsonarray.length());
+                for(int j=0;j<trans_jsonarray.length();j++)
+            	{
+            		JSONObject t=trans_jsonarray.getJSONObject(j);
+            		MovieTranslations mt = 
+            			new MovieTranslations(
+            				t.getString("id"),
+            				t.getString("title"), 
+            				t.getString("desc"), 
+            				t.getString("img"));
+            		mi.translations.add(mt);
+            	}
+                movieItems.add(mi);
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+ 	}
+
+    public JSONArray getJSONFromUrl(String url) {
+    	JSONArray jsonarr=null;
+    	String json = "";
+    	String json_fn = getRootPath() + "movie_list.json";
+    	try{
+    	// Making HTTP request
+    	
+    	Log.d(TAG, "json_fn: " + json_fn);
+    	json = getStringFromFile(json_fn);
+    	Log.d(TAG, "json: " + json);
+    	} catch(Exception e) {
+    		Log.d(TAG,"Failed read json: " + json_fn);
+    		//return null;
+            json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\"}]";
+    	} 
+    	// try parse the string to a JSONArray
+    	try {
+    		jsonarr = new JSONArray(json);
+    	} catch (JSONException e) {
+    		Log.d(TAG,"Failed parse json: " + json_fn);
+    	}
+
+    // return JSON String
+    return jsonarr;  //<<<< return JSONArray instead of JSONObject
+}
+
 
 }
