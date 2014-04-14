@@ -23,6 +23,14 @@
         android:text="                "
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
+    <ListView
+              android:id="@+id/mv_list"
+              android:gravity="center"
+              android:layout_marginTop="10dp"
+              android:layout_height="wrap_content"
+              android:layout_width="match_parent">
+    </ListView>
+
     <TextView
         android:id="@+id/mv_found_display"
         android:layout_width="fill_parent"
