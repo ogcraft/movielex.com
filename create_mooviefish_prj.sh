@@ -3,4 +3,4 @@ android create project \
 --name MoovieFishApp \
 --path ./mooviefishapp \
 --activity MainActivity \
---package com.moviefish.mooviefishapp 
+--package com.mooviefish.mooviefishapp 
