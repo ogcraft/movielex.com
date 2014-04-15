@@ -13,8 +13,8 @@ public interface amatch_interfaceConstants {
   public final static int BUFFERFRAMES = amatch_interfaceJNI.BUFFERFRAMES_get();
   public final static int VECSAMPS_MONO = amatch_interfaceJNI.VECSAMPS_MONO_get();
   public final static int SR = amatch_interfaceJNI.SR_get();
-  public final static int SEC_TO_RECORD = amatch_interfaceJNI.SEC_TO_RECORD_get();
-  public final static int SEC_TO_MATCH = amatch_interfaceJNI.SEC_TO_MATCH_get();
-  public final static int NRECSAMPLES = amatch_interfaceJNI.NRECSAMPLES_get();
+  public final static double SEC_TO_RECORD = amatch_interfaceJNI.SEC_TO_RECORD_get();
+  public final static double SEC_TO_MATCH = amatch_interfaceJNI.SEC_TO_MATCH_get();
+  public final static double DELAY_PER_SEC = amatch_interfaceJNI.DELAY_PER_SEC_get();
   public final static double SEC_PER_KEY = amatch_interfaceJNI.SEC_PER_KEY_get();
 }

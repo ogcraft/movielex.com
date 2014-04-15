@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.mooviefish.mooviefishapp.CustomListViewAdapter;
 import com.mooviefish.mooviefishapp.MFApplication;
 import com.mooviefish.mooviefishapp.R;
-import com.mooviefish.mooviefishapp.RowItem;
+import com.mooviefish.mooviefishapp.MovieItem;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;

@@ -70,6 +70,42 @@ public class AmatchTestActivity extends Activity {
     private TextView found_display_view;
     private Button btn_start_search;
 
+    Handler found_display_view_handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {              
+            Bundle bundle = msg.getData();
+            long found_ms = bundle.getLong("found_ms");
+            long search_duration_ms = bundle.getLong("search_duration_ms");
+            if(found_display_view != null) {
+                String s = null;
+                if(found_ms > 0) {
+                   s = String.format("Found sec: %f\n Search took: %f sec", 
+                    found_ms/1000.0, search_duration_ms/1000.0);     
+                } else {
+                   s = String.format("NotFound. Search took: %f sec.\n Please sync again",
+                    search_duration_ms/1000.0);     
+                }
+                found_display_view.setText(s);
+            }
+        }
+    };
+       
+    Handler seekbar_handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {              
+            Bundle bundle = msg.getData();
+            
+        }
+    };     
+
+    Handler progress_display_view_handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {              
+            Bundle bundle = msg.getData();
+            
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +134,8 @@ public class AmatchTestActivity extends Activity {
         fpkeys_fn_view = (TextView)findViewById(R.id.fpkeys_fn);
         found_display_view = (TextView)findViewById(R.id.found_display);
         btn_start_search = (Button)findViewById(R.id.btn_start_search);
-       
+        //btn_start_search.setEnabled(false);
+        
         btnLoadFpkeys.setOnClickListener(new OnClickListener()
         {
             @Override
@@ -134,9 +171,13 @@ public class AmatchTestActivity extends Activity {
         });
 
 		fpkeys_fn_view.setText("App ver: " + gs.appVersion + ", Amatch: " + amatch_interface.AMATCH_VER);
-		btn_start_search.setEnabled(false);
+		//btn_start_search.setEnabled(false);
 		found_display_view.setText("");
-
+        // Connect to handlers
+        gs.amatch.found_display_view_handler    = found_display_view_handler;
+        gs.amatch.seekbar_handler               = seekbar_handler;
+        gs.amatch.progress_display_view_handler = progress_display_view_handler;
+        
 	}
 
     public void onDestroy(){
@@ -158,7 +199,7 @@ public class AmatchTestActivity extends Activity {
                     Log.d(TAG, "onActivity(): filename: " + filename + " data_root_path: " + data_root_path);
                     if(file_selecting_button_id == R.id.btn_load_fpkeys) {
                     	track_keys_fn = filename;
-                    	//load_track_fpkeys(track_keys_fn);        	
+                    	load_fpkeys(track_keys_fn);        	
                     	
                     } else if(file_selecting_button_id == R.id.btn_load_translation) {
                     	Button b = (Button)findViewById(R.id.btn_load_translation);   	
@@ -166,6 +207,7 @@ public class AmatchTestActivity extends Activity {
                     	translation_fn = filename;
                     	Log.d(TAG, "translation_fn: " + translation_fn);
                     	btnLoadTranslation.setText("Translation: " + translation_fn.substring(data_root_path.length()+1));
+                        gs.amatch.createMediaPlayerForTranslation(translation_fn);
                     }
                     break;
                 case SAVE:
@@ -181,34 +223,59 @@ public class AmatchTestActivity extends Activity {
     
     public void btn_start_searchClick(View view)
     {
-    	btnLoadFpkeys.setEnabled(false);
-    	found_display_view.setText("Please wait. Synchronizing...");
-		// start search
+        Log.d(TAG,"AmatchTestActivity.btn_start_searchClick()");
+	   if(!gs.amatch.isMediaPlayerReady)
+        {
+            Log.d(TAG,"btn_start_searchClick(): MediaPlayer still not Ready.");
+            Toast.makeText(getApplicationContext(), "MediaPlayer still not Ready.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(gs.amatch.isMatching)
+        {
+            Toast.makeText(getApplicationContext(), "Still in progress. Please wait...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        found_display_view.setText("Please wait. Synchronizing...");
+        //seekbar.setMax(gs.amatch.getTranslationMaxDuration());
+        seekbar.setProgress(0);
+        seekbar_handler.postDelayed(UpdateTranslationTime,100);
+        gs.amatch.start_recording_thread();
     }
-    public void btn_load_fpkeysClick(View view)
-    {
 
+    public void btn_stopClick(View view)
+    {
+        gs.amatch.stop_plaing_translation();
     }
-    
-/*    
+
+    public void load_fpkeys(String fn)
+    {
+        long keys = gs.amatch.load_fpkeys(fn);
+        String short_fn = fn.substring(data_root_path.length()+1);
+        if(gs.amatch.isFpkeysLoaded) {
+            btnLoadFpkeys.setText("Index: " + short_fn);
+        } else {
+            btnLoadFpkeys.setText("Failed load: " + short_fn);
+        }
+    }
+
     private Runnable UpdateTranslationTime = new Runnable() {
         public void run() {
-
-           currentPlayingTime_ms = mp.getCurrentPosition();
-           long min = TimeUnit.MILLISECONDS.toMinutes((long) currentPlayingTime_ms);
-           long sec = TimeUnit.MILLISECONDS.toSeconds((long) currentPlayingTime_ms) - 
+            seekbar.setMax((int)gs.amatch.getTranslationMaxDuration());
+            long currentPlayingTime_ms = gs.amatch.getCurrentTranslationPosition();
+            long min = TimeUnit.MILLISECONDS.toMinutes((long) currentPlayingTime_ms);
+            long sec = TimeUnit.MILLISECONDS.toSeconds((long) currentPlayingTime_ms) - 
                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) currentPlayingTime_ms));
            
-           progress_display_view.setText(
-        		   String.format("Playing %.2f ( %3d:%02d ) sec from %.2f sec",
-                		   			currentPlayingTime_ms / 1000.0,
-                		   			min, sec,
-                		   			finalTime_ms / 1000.0
-        		   ));
+            progress_display_view.setText(
+                   String.format("Playing %.2f ( %3d:%02d ) sec from %.2f sec",
+                                    currentPlayingTime_ms / 1000.0,
+                                    min, sec,
+                                    gs.amatch.getTranslationMaxDuration() / 1000.0
+                   ));
            
-           seekbar.setProgress((int)currentPlayingTime_ms);
-           seekbar_handler.postDelayed(this, 100);
+            seekbar.setProgress((int)currentPlayingTime_ms);
+            seekbar_handler.postDelayed(this, 100);
         }
      };
-*/
+
 }

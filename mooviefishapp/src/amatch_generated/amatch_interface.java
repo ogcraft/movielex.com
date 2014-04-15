@@ -13,33 +13,24 @@ public class amatch_interface implements amatch_interfaceConstants {
     return amatch_interfaceJNI.amatch_version();
   }
 
-  public static int nrecsamples() {
-    return amatch_interfaceJNI.nrecsamples();
+  public static int num_samples_to_record() {
+    return amatch_interfaceJNI.num_samples_to_record();
   }
 
-  public static SWIGTYPE_p_amatch_context get_amatch_context() {
-    long cPtr = amatch_interfaceJNI.get_amatch_context();
-    return (cPtr == 0) ? null : new SWIGTYPE_p_amatch_context(cPtr, false);
+  public static double num_sec_to_record() {
+    return amatch_interfaceJNI.num_sec_to_record();
   }
 
-  public static boolean open_audio_device() {
-    return amatch_interfaceJNI.open_audio_device();
+  public static int get_sample_rate() {
+    return amatch_interfaceJNI.get_sample_rate();
+  }
+
+  public static double delay_per_sec() {
+    return amatch_interfaceJNI.delay_per_sec();
   }
 
   public static long read_track_fpkeys(String fn) {
     return amatch_interfaceJNI.read_track_fpkeys(fn);
-  }
-
-  public static void close_audo_device() {
-    amatch_interfaceJNI.close_audo_device();
-  }
-
-  public static void skip_samples(int nsamples) {
-    amatch_interfaceJNI.skip_samples(nsamples);
-  }
-
-  public static int read_audio_in(float[] inbuffer, long nsamples) {
-    return amatch_interfaceJNI.read_audio_in(inbuffer, nsamples);
   }
 
   public static int generate_fp_keys_from_in() {
@@ -50,48 +41,20 @@ public class amatch_interface implements amatch_interfaceConstants {
     return amatch_interfaceJNI.match_sample();
   }
 
-  public static int recording() {
-    return amatch_interfaceJNI.recording();
-  }
-
-  public static void start_playing() {
-    amatch_interfaceJNI.start_playing();
-  }
-
-  public static void stop_playing() {
-    amatch_interfaceJNI.stop_playing();
-  }
-
-  public static void pause_playing() {
-    amatch_interfaceJNI.pause_playing();
-  }
-
-  public static void start_recording() {
-    amatch_interfaceJNI.start_recording();
-  }
-
-  public static void stop_recording() {
-    amatch_interfaceJNI.stop_recording();
-  }
-
-  public static void pause_recording() {
-    amatch_interfaceJNI.pause_recording();
-  }
-
-  public static int player_state() {
-    return amatch_interfaceJNI.player_state();
-  }
-
-  public static int recorder_state() {
-    return amatch_interfaceJNI.recorder_state();
-  }
-
   public static void get_recorded_samples(float[] p) {
     amatch_interfaceJNI.get_recorded_samples(p);
   }
 
+  public static void put_recorded_samples(short[] p, int size) {
+    amatch_interfaceJNI.put_recorded_samples(p, size);
+  }
+
   public static int get_recorded_samples_size() {
     return amatch_interfaceJNI.get_recorded_samples_size();
+  }
+
+  public static void clear_recorded_samples() {
+    amatch_interfaceJNI.clear_recorded_samples();
   }
 
   public static void write_recorded_as_file(String fname) {
