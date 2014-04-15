@@ -5,6 +5,7 @@ All rights reserved.
 */
 
 package com.mooviefish.mooviefishapp;
+import amatch_generated.amatch_interface;
 import com.lamerman.FileDialog;
 import com.lamerman.SelectionMode;
 import java.io.File;
@@ -132,7 +133,7 @@ public class AmatchTestActivity extends Activity {
             }
         });
 
-		fpkeys_fn_view.setText("App ver: " + gs.appVersion/* + amatch_interface.amatch_version()*/);
+		fpkeys_fn_view.setText("App ver: " + gs.appVersion + ", Amatch: " + amatch_interface.AMATCH_VER);
 		btn_start_search.setEnabled(false);
 		found_display_view.setText("");
 

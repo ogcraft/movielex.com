@@ -26,6 +26,10 @@ public class MovieItem {
         return id + "|" + title;
     }
 
+    public String getTranslationFileName(String lang) {
+        return (id + "-" + lang + ".mp3");
+    }
+
     public Uri getImgUri() {
         //String fn = Environment.getExternalStorageDirectory() + "/MoovieFish/" + desc;
         File file = new File(img); 

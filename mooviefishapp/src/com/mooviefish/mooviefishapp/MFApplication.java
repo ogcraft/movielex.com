@@ -1,4 +1,5 @@
 package com.mooviefish.mooviefishapp;
+import amatch_generated.amatch_interface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ import android.util.Log;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "0.2"; 
+	public static final String appVersion = "0.3"; 
 	private static final String TAG = "MoovieFishApp";
 	private final String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 
