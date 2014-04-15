@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import android.util.Log; 
+import com.mooviefish.mooviefishapp.Amatch;
+
 /**
 * This is a global state for MoovieFishApp
 *
@@ -36,6 +38,7 @@ public class MFApplication extends Application
 	public static final String appVersion = "0.3"; 
 	private static final String TAG = "MoovieFishApp";
 	private final String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
+	public static Amatch amatch = null;
 
 	List<MovieItem> movieItems;
 
@@ -45,6 +48,14 @@ public class MFApplication extends Application
 	public String getRootPath() {
 		return root_path;
 	}
+
+	@Override
+  	public void onCreate()
+  	{
+    	super.onCreate();
+     
+    	amatch = new Amatch(this);
+  	}
 
 	public static String convertStreamToString(InputStream is) throws Exception {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
