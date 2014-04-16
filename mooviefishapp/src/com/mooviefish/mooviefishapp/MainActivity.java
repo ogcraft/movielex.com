@@ -45,7 +45,6 @@ public class MainActivity extends Activity  implements
         setContentView(R.layout.main);
         Log.d(TAG, "onCreate(): root_path: " + gs.getRootPath());
         
-        gs.createMovieItems();
         
         listView = (ListView) findViewById(R.id.list);
         CustomListViewAdapter adapter = new CustomListViewAdapter(this,

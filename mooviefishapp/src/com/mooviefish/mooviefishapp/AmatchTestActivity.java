@@ -172,11 +172,11 @@ public class AmatchTestActivity extends Activity {
 
 		fpkeys_fn_view.setText("App ver: " + gs.appVersion + ", Amatch: " + amatch_interface.AMATCH_VER);
 		//btn_start_search.setEnabled(false);
-		found_display_view.setText("");
         // Connect to handlers
         gs.amatch.found_display_view_handler    = found_display_view_handler;
-        gs.amatch.seekbar_handler               = seekbar_handler;
-        gs.amatch.progress_display_view_handler = progress_display_view_handler;
+        //gs.amatch.seekbar_handler               = seekbar_handler;
+        //gs.amatch.progress_display_view_handler = progress_display_view_handler;
+		found_display_view.setText("  \n  ");
         
 	}
 
@@ -235,7 +235,7 @@ public class AmatchTestActivity extends Activity {
             Toast.makeText(getApplicationContext(), "Still in progress. Please wait...", Toast.LENGTH_SHORT).show();
             return;
         }
-        found_display_view.setText("Please wait. Synchronizing...");
+        found_display_view.setText("Please wait.\nSynchronizing...");
         //seekbar.setMax(gs.amatch.getTranslationMaxDuration());
         seekbar.setProgress(0);
         seekbar_handler.postDelayed(UpdateTranslationTime,100);

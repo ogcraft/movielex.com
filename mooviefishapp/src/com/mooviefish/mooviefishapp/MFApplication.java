@@ -35,7 +35,7 @@ import com.mooviefish.mooviefishapp.Amatch;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "0.5"; 
+	public static final String appVersion = "0.7"; 
 	private static final String TAG = "MoovieFishApp";
 	private final String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -54,7 +54,8 @@ public class MFApplication extends Application
   	{
     	super.onCreate();
      
-    	amatch = new Amatch(this);
+    	amatch = Amatch.initInstance(this);
+        createMovieItems();
   	}
 
 	public static String convertStreamToString(InputStream is) throws Exception {

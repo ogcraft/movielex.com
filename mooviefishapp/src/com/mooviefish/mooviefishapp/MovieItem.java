@@ -27,7 +27,11 @@ public class MovieItem {
     }
 
     public String getTranslationFileName(String lang) {
-        return (id + "-" + lang + ".mp3");
+        return (id + "/" + id + "-" + lang + ".mp3");
+    }
+
+    public String getFpkeysFileName() {
+        return (id + "/" + id + "-en.fpkeys");
     }
 
     public Uri getImgUri() {

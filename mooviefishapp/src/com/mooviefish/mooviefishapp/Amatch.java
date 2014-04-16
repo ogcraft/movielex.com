@@ -49,14 +49,15 @@ import android.widget.Toast;
 
 public class Amatch implements 
         OnPreparedListener, OnSeekCompleteListener, OnErrorListener {
+	private static Amatch instance;
     private MFApplication gs; 
 	private String TAG = "Amatch";
 
     //////// Handlers //////////
     
     Handler found_display_view_handler = null;
-    Handler seekbar_handler = null;
-    Handler progress_display_view_handler = null;
+    //Handler seekbar_handler = null;
+    //Handler progress_display_view_handler = null;
     
     ////////////////////////////
     public boolean isFpkeysLoaded = false;
@@ -130,8 +131,14 @@ public class Amatch implements
             }
         }; 
 
+	public static Amatch initInstance(MFApplication app) {
+		if (instance == null) {
+			instance = new Amatch(app);
+		}
+		return instance;
+	}
 
-    public Amatch(MFApplication app) {
+    private Amatch(MFApplication app) {
         gs = app;
         TAG = gs.getTAG();
         Log.d(TAG,"Amatch() constructor");
