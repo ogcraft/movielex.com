@@ -35,7 +35,7 @@ import com.mooviefish.mooviefishapp.Amatch;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "0.7"; 
+	public static final String appVersion = "0.8"; 
 	private static final String TAG = "MoovieFishApp";
 	private final String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -129,7 +129,7 @@ public class MFApplication extends Application
     	} catch(Exception e) {
     		Log.d(TAG,"Failed read json: " + json_fn);
     		//return null;
-            json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\"}]";
+            json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\", \"translations\": []}]";
     	} 
     	// try parse the string to a JSONArray
     	try {
