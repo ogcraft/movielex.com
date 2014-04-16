@@ -3,10 +3,10 @@
         "id": "monsters",
         "title": "Monsters University (2013)",
         "desc": "A look at the relationship between Mike and Sulley during their days at Monsters University -- when they weren't necessarily the best of friends.",
-        "img": "monster.jpg",
+        "img": "monsters.jpg",
         "translations" : [
         {"id" : "ru", "title":"Русский","desc":"From original dvd", "img":""},
-        {"id" : "he", "title":"יברית","desc":"From original dvd", "img":""} 
+        {"id" : "he", "title":"עברית","desc":"From original dvd", "img":""} 
         ]
     },
     {
@@ -16,7 +16,7 @@
        	"img": "smurfs.jpg",
         "translations" : [
         {"id" : "ru", "title":"Русский","desc":"From original dvd", "img":""},
-        {"id" : "he", "title":"יברית","desc":"From original dvd", "img":""} 
+        {"id" : "he", "title":"עברית","desc":"From original dvd", "img":""} 
         ]
     },
     {

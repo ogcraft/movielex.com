@@ -307,8 +307,8 @@ public class Amatch implements
         Log.d(TAG,"Start searching");
         matching_start_ms = System.currentTimeMillis();
         testcount1 = testcount1 + 1;
-        int found_index = 86 * 1000 * (testcount1 % 5); //match_sample();
-        //int found_index = match_sample();
+        //int found_index = 86 * 1000 * (testcount1 % 5); //match_sample();
+        int found_index = match_sample();
         long index_found_ms = System.currentTimeMillis();
         long time_to_match_ms = index_found_ms - matching_start_ms; 
         Log.d(TAG,"found_index: " + found_index + " ms took: " + time_to_match_ms);

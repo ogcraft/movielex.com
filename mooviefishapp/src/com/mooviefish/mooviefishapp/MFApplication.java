@@ -35,7 +35,7 @@ import com.mooviefish.mooviefishapp.Amatch;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "0.8"; 
+	public static final String appVersion = "0.9"; 
 	private static final String TAG = "MoovieFishApp";
 	private final String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
