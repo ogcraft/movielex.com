@@ -51,6 +51,10 @@ public class MFApplication extends Application
     private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
     static int CONNECTION_TIMEOUT = 0; //msec
     static int DATARETRIEVAL_TIMEOUT = 0; //msec
+    static String moovifishSite = "http://www.mooviefish.com";
+    static String dataLang = "en";
+    static String GETMOVIES_REST = "%s/api/movies/%s";
+    static String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%d";
 
 	List<MovieItem> movieItems;
 
@@ -116,13 +120,15 @@ public static String getStringFromFile (String filePath) throws Exception {
 }
 
 public void createMovieItems() {
- JSONArray jsonarray = getJSONFromUrl("");
+    String getMoviesUrl = String.format(GETMOVIES_REST, moovifishSite, dataLang);
+    Log.d(TAG, "createMovieItems(): getMoviesUrl: " + getMoviesUrl);
+    JSONArray jsonarray = getMovieList(getMoviesUrl);
 
- movieItems = new ArrayList<MovieItem>();
+    movieItems = new ArrayList<MovieItem>();
 
- try {
-    for(int i=0;i<jsonarray.length();i++)
-    {
+    try {
+        for(int i=0;i<jsonarray.length();i++)
+        {
                 JSONObject c=jsonarray.getJSONObject(i);// Used JSON Object from Android
                 //Storing each Json in a string variable
                 String ID 	=c.getString("id");
@@ -154,33 +160,47 @@ public void createMovieItems() {
 }
 
 public JSONArray getJSONFromUrl(String url) {
- JSONArray jsonarr=null;
- String json = "";
- String json_fn = getRootPath() + "movie_list.json";
- try{
+    JSONArray jsonarr=null;
+    String json = "";
+    String json_fn = getRootPath() + "movie_list.json";
+    try {
     	// Making HTTP request
 
-     Log.d(TAG, "json_fn: " + json_fn);
-     json = getStringFromFile(json_fn);
-     Log.d(TAG, "json: " + json);
- } catch(Exception e) {
-  Log.d(TAG,"Failed read json: " + json_fn);
+       Log.d(TAG, "json_fn: " + json_fn);
+       json = getStringFromFile(json_fn);
+       Log.d(TAG, "json: " + json);
+    } catch(Exception e) {
+      Log.d(TAG,"Failed read json: " + json_fn);
     		//return null;
-  json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\", \"translations\": []}]";
-} 
+      json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\", \"translations\": []}]";
+    } 
     	// try parse the string to a JSONArray
-try {
-  jsonarr = new JSONArray(json);
-} catch (JSONException e) {
-  Log.d(TAG,"Failed parse json: " + json_fn);
-}
+    try {
+      jsonarr = new JSONArray(json);
+    } catch (JSONException e) {
+      Log.d(TAG,"Failed parse json: " + json_fn);
+    }
 
     // return JSON String
     return jsonarr;  //<<<< return JSONArray instead of JSONObject
 }
 
+public JSONArray getMovieList(String serviceUrl) {
+    InputStream in = requestWebService(serviceUrl);
+    String response = getResponseText(in);
+    Log.d(TAG, "getMovieList(): response: " + response);
+    try {
+        return new JSONArray(response);
+    } catch (JSONException e){
+        Log.d(TAG,"getMovieList(): Failed parse json: " + response);        
+    }    
+    return null;
+}
+
 public static InputStream requestWebService(String serviceUrl) {
     
+    Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl);
+
     disableConnectionReuseIfNecessary();
  
     HttpURLConnection urlConnection = null;
