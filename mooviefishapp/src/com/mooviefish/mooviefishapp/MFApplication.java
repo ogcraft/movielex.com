@@ -27,6 +27,9 @@ import android.text.TextUtils;
 import android.os.Build;
 import com.mooviefish.mooviefishapp.Amatch;
 import java.net.URL;
+import android.os.StrictMode;
+import android.os.Build;
+
 /**
 * This is a global state for MoovieFishApp
 *
@@ -44,14 +47,15 @@ import java.net.URL;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.0"; 
+	public static final String appVersion = "1.1"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
     private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
     static int CONNECTION_TIMEOUT = 0; //msec
     static int DATARETRIEVAL_TIMEOUT = 0; //msec
-    static String moovifishSite = "http://www.mooviefish.com";
+    static String moovifishSite = "http://mooviefish.com";
+    //static String moovifishSite = "http://192.168.10.109:3000";
     static String dataLang = "en";
     static String GETMOVIES_REST = "%s/api/movies/%s";
     static String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%d";
@@ -94,6 +98,12 @@ public class MFApplication extends Application
     public void onCreate()
     {
     	super.onCreate();
+        Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT);
+
+        if( Build.VERSION.SDK_INT >= 9){
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy); 
+        }
         root_path = findRootPath();
         amatch = Amatch.initInstance(this);
         createMovieItems();
@@ -122,8 +132,8 @@ public static String getStringFromFile (String filePath) throws Exception {
 public void createMovieItems() {
     String getMoviesUrl = String.format(GETMOVIES_REST, moovifishSite, dataLang);
     Log.d(TAG, "createMovieItems(): getMoviesUrl: " + getMoviesUrl);
-    JSONArray jsonarray = getMovieList(getMoviesUrl);
-
+    //JSONArray jsonarray = getMovieList(getMoviesUrl);
+    JSONArray jsonarray =getJSONFromUrl("");
     movieItems = new ArrayList<MovieItem>();
 
     try {
@@ -216,10 +226,12 @@ public static InputStream requestWebService(String serviceUrl) {
         int statusCode = urlConnection.getResponseCode();
         if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             // handle unauthorized (if service requires user login)
+            Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl + " Error HTTP_UNAUTHORIZED");
         } else if (statusCode != HttpURLConnection.HTTP_OK) {
             // handle any other errors, like 404, 500,..
+            Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl + " Error " + statusCode);
         }
-         
+         Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl + " Reading inputStream"); 
         // create JSON object from content
         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
         //return new JSONObject(getResponseText(in));
@@ -227,11 +239,14 @@ public static InputStream requestWebService(String serviceUrl) {
          
     } catch (MalformedURLException e) {
         // URL is invalid
+        Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl + " Error URL is invalid");
     } catch (SocketTimeoutException e) {
         // data retrieval or connection timed out
+        Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl + " Error connection timed out");
     } catch (IOException e) {
         // could not read response body 
         // (could not create input stream)
+        Log.d(TAG,"requestWebService() serviceUrl: " + serviceUrl + " Error could not read response body");
     } finally {
         if (urlConnection != null) {
             urlConnection.disconnect();

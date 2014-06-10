@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+
 public class MainActivity extends Activity  implements
         OnItemClickListener 
 {
@@ -41,10 +42,9 @@ public class MainActivity extends Activity  implements
     	
     	gs = (MFApplication) getApplication();
     	TAG = gs.getTAG();
-    	Log.d(TAG,"MainActivity.onCreate");
+    	//Log.d(TAG,"MainActivity.onCreate");
         setContentView(R.layout.main);
-        Log.d(TAG, "onCreate(): root_path: " + gs.getRootPath());
-        
+        Log.d(TAG, "MainActivity.onCreate(): root_path: " + gs.getRootPath());
         
         listView = (ListView) findViewById(R.id.list);
         CustomListViewAdapter adapter = new CustomListViewAdapter(this,
