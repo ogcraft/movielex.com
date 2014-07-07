@@ -164,7 +164,7 @@ public class AmatchTestActivity extends Activity {
 				intent.putExtra(FileDialog.START_PATH, data_root_path);
                 intent.putExtra(FileDialog.CAN_SELECT_DIR, false);
                 // set file filter
-                intent.putExtra(FileDialog.FORMAT_FILTER, new String[] { "mp3","ogg","wav" });
+                intent.putExtra(FileDialog.FORMAT_FILTER, new String[] { "mp3","ogg","wav", "spx" });
                 intent.putExtra(FileDialog.SELECTION_MODE, SelectionMode.MODE_OPEN);
                 AmatchTestActivity.this.startActivityForResult(intent, FileAction.LOAD.value);
             }
