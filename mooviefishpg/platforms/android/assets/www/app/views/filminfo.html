@@ -1,0 +1,36 @@
+<ion-view id="filminfo" scroll="true" title="{{film.title}}">
+    <ion-nav-bar id="filminfo-bar" class="bar-positive" style="visibility: visible">
+<!--        <a class="ion-arrow-left-c button button-icon button-positive" href="#/menu/main"></a>-->
+        <img class="logo" src="assets/icons/Logo.png"/>
+    </ion-nav-bar>
+    <ion-content class="filminfo-content">
+        <div class="container">
+            <div class="item item-body" id="item-body">
+                <div class="film-info-top">
+                    <img src="{{film.img}}"/>
+                    <h2 class="header">{{film.title}}</h2>
+                    <p id="description" class="description">{{film.desc}}</p>
+                </div>
+                <div class="film-info-bottom">
+                    <ul class="list">
+                        <li class="item" ng-repeat="(k, tr) in film.translations">
+                            <img class="language-flag"src="{{tr.img}}" ng-if="tr.img !== null" /> 
+                            <p ng-if="tr.img === null">{{tr.lang}}</p>
+                            <p>{{tr.title}}</p>
+                            <a class="button button-outline button-stable" ng-show="tr.play" href="#/menu/watchfilm/{{film.id}}/{{tr.lang}}">
+                                {{lang('Play')}}
+                            </a>
+                            <button class="button button-outline button-stable" ng-hide="tr.download === false" ng-show="tr.download" ng-click="download(tr)" ng-if="tr.file !== null" >
+                                {{lang('Download')}}
+                            </button>
+                            
+                            <button class="button button-outline button-stable" ng-show="tr.downloading">
+                                <span class="ion-loading-c"></span>{{lang('Downloading')}} 
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

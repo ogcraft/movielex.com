@@ -1,6 +1,6 @@
 /*******
 from DownloadCtrl
-angular.module('MovieFish')
+angular.module('MoovieFish')
 
 var fileTransfer = new FileTransfer();
 
