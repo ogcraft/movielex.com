@@ -1,0 +1,52 @@
+.list{
+    width:100%;
+}
+.language-parameter{
+    float:left;
+    width:80%;
+}
+.selector select{
+    float:right;
+}
+.selector{
+    width:90%;
+}
+label{
+    width:100%;
+}
+#settings .has-header .list .item
+{
+    color:white;
+    border:none;
+    background-color:#1A1A1A;
+    
+    
+}
+
+.has-header .list .item-button-right .ion-refresh
+{
+    color:white;
+}
+.has-header .list .item-select
+{
+    color:white;
+    border:none;
+    background-color:#1A1A1A;
+    
+    
+}
+.has-header .list div select
+{
+    color:white;
+    background-color:#1A1A1A;
+}
+.has-header
+{
+    background-color:#1A1A1A;
+}
+
+#modal{
+    width: 70%;
+    min-height: 400px;
+    margin: 80px 15%;
+}

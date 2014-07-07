@@ -1,0 +1,36 @@
+<ion-view id="watchfilm" scroll="true"  title="{{film.title}}">
+    <ion-nav-bar id="watchfilm-bar" class="bar-positive" style="visibility: visible">
+        <img class="logo" src="assets/icons/Logo.png"/>
+    </ion-nav-bar>
+    <ion-content>
+        <div class="container">
+            <div class="item item-body" >
+                <div class="watch-film-top">
+                    <div class="picture">
+                        <img src="{{film.img}}" />
+                    </div>
+                    <div class="picture-information">
+                        <h2 class="header">{{film.title}}</h2>
+                        <p>{{translation.title}}</p>
+                        <img class="film-country-flag" src="{{translation.img}}" />
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="film-player" >
+                    <div class="duration"><span style="float:left">{{toHHMMSS(fakepos.position)}}</span><span style="float:right;">{{toHHMMSS(Media.duration)}}</span></div>
+                    <br>
+                    <div class="range">
+                        <input id="range" type="range" min="0" max="{{Media.duration}}" ng-model="fakepos.position" value="{{fakepos.position}}" ng-change="rangeChanged(fakepos.position)">
+                    </div>
+                    <button class="button button-outline button-stable ion-pause left" ng-show="Media.status === 'play'" ng-click="pause()"></button>
+                    <button class="button button-outline button-stable left" ng-click="play()" ng-hide="Media.status === 'play'">
+                        {{lang('Start')}}
+                    </button>
+                    <button class="button button-outline button-stable right" ng-click="stop()">
+                        {{lang('Stop')}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

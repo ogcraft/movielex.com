@@ -1,0 +1,51 @@
+<ion-view id="settings" scroll="true" title="{{lang('Settings')}}">
+    <div class="bar bar-header">
+        <h1 class="title">{{lang('Settings')}}</h1>
+    </div>
+    <ion-content padding="false" class="content has-header" id="settings">
+        <div class="list">
+            <div ng-click="refreshMovieList()" class="item item-button-right">
+                {{lang('Refresh')}}
+                <button class="button button-icon ion-refresh"></button>
+            </div>
+            <div class="item" ng-click="modal.show()">
+                {{lang('Data location')}}
+            </div>
+            <div class="item item-select">
+                {{lang('Language')}}
+                <select ng-model="myLanguage" ng-options="language for language in languages" ng-change="changeLanguage(myLanguage)"></select>
+            </div>
+            
+            
+            <div class="item" ng-show="android" ng-click="exit()">
+                {{lang('Exit')}}
+            </div>
+            
+        </div>
+    </ion-content>
+    <script id="modal.html" type="text/ng-template">
+      <div class="modal" id="modal" ng-controller="ModalCtrl">
+        <ion-nav-bar id="mainmenu" class="bar-positive" style="visibility: visible">
+            <h1 class="title">Change path</h1>
+        </ion-nav-bar>
+        <div class="bar bar-subheader">
+          {{current_dir.fullPath}}
+        </div>
+        
+        <ion-content class="has-header has-subheader">
+            <div class="list">
+                <div class="item" ng-click="go_back()">
+                    ..
+                </div>
+                <div class="item" ng-repeat="dir in dirs" ng-click="goto(dir)">
+                    {{dir.name}}
+                </div>
+            </div>
+        </ion-content>
+        <div class="bar bar-footer">
+          <button class="button button-large button-assertive" ng-click="create_dir()">Create</button>
+          <button class="button button-large button-assertive" ng-click="change_dir()">OK</button>
+        </div>
+      </div>
+    </script>
+</ion-view>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<widget xmlns = "http://www.w3.org/ns/widgets"
+    xmlns:gap   = "http://phonegap.com/ns/1.0"
+    id          = "com.smartsolutions.moviefish"
+    version     = "1.0.0"
+    versionCode = "1" >
+
+    <!-- versionCode is optional and Android only -->
+    
+    <name>MovieFish</name>
+
+    <description>MovieFish</description>
+
+    <author href="http://www.moviefish.com" email="info@moviefish.com">MovieFish</author>
+        
+    <preference name="permissions" value="none"/>   
+    <preference name="phonegap-version" value="3.3.0" />
+    <preference name="orientation" value="portrait" />
+    <preference name="KeepRunning" value="true"/>
+    
+    <preference name="detect-data-types" value="false" />
+
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="show-splash-screen-spinner" value="false" />
+
+    <gap:plugin name="org.apache.cordova.core.file" />
+    <gap:plugin name="org.apache.cordova.core.media" />
+    <gap:plugin name="org.apache.cordova.core.device" />
+    <gap:plugin name="org.apache.cordova.core.file-transfer" />
+    <gap:plugin name="org.apache.cordova.inappbrowser" />
+    <gap:plugin name="org.apache.cordova.core.dialogs" />
+    <gap:plugin name="org.apache.cordova.core.splashscreen" version="0.2.3" />
+    
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="show-splash-screen-spinner" value="false" />
+
+    <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="auto-hide-splash-screen" value="false" />
+
+
+    <preference name="fullscreen" value="true" />
+    
+    <!-- DISABLE UIWebView bouncing vertically  -->
+    <!-- ANDROID -->
+    <preference name="disallowOverscroll" value="true" />
+    <preference name="webviewbounce" value="false" />
+    <!-- IOS -->
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="webviewbounce" value="false" />
+    <preference name="UIWebViewBounce" value="false" />
+    
+    <feature name="Media">
+        <param name="ios-package" value="CDVSound" />
+        <param name="android-package" value="org.apache.cordova.media.AudioHandler" />
+    </feature>
+    
+    <gap:config-file platform="ios" parent="UIBackgroundModes" overwrite="true">
+        <array> 
+            <string>audio</string>
+        </array>
+    </gap:config-file>
+  
+    <icon src="assets/icons/Logo.png" />
+    <icon src="assets/icons/ios/Icon.png" gap:platform="ios" width="57" height="57" />
+    <icon src="assets/icons/ios/Icon@2x.png" gap:platform="ios" width="114" height="114" />
+    <icon src="assets/icons/ios/Icon-72.png" gap:platform="ios" width="72" height="72" />
+    <icon src="assets/icons/ios/Icon-72@2x.png" gap:platform="ios" width="144" height="144" />
+
+    <icon src="assets/icons/android/drawable-ldpi/ic_launcher.png" gap:platform="android" gap:density="ldpi" />
+    <icon src="assets/icons/android/drawable-mdpi/ic_launcher.png" gap:platform="android" gap:density="mdpi" />
+    <icon src="assets/icons/android/drawable-hdpi/ic_launcher.png" gap:platform="android" gap:density="hdpi" />
+    <icon src="assets/icons/android/drawable-xhdpi/ic_launcher.png" gap:platform="android" gap:density="xhdpi" />
+    <icon src="assets/icons/android/drawable-xxhdpi/ic_launcher.png" gap:platform="android" gap:density="xxhdpi" />
+
+    <gap:splash src="assets/splash/iphone/Default.png" gap:platform="ios" width="320" height="480" />
+    <gap:splash src="assets/splash/iphone/Default@2x.png" gap:platform="ios" width="640" height="960" />
+    <gap:splash src="assets/splash/iphone/Default-568h@2x.png" gap:platform="ios" width="640" height="1136" />
+    <gap:splash src="assets/splash/iphone/Default-Portrait.png" gap:platform="ios" width="768" height="1024" />
+    <gap:splash src="assets/splash/iphone/Default-Landscape.png" gap:platform="ios" width="1024" height="748" />
+    <gap:splash src="assets/splash/iphone/Default-Portrait@2x.png" gap:platform="ios" width="1536" height="2048" />
+    <gap:splash src="assets/splash/iphone/Default-Landscape@2x.png" gap:platform="ios" width="2048" height="1536" />
+
+    <gap:splash src="assets/splash/android/images/res-notlong-port-hdpi/default.png" gap:platform="android" gap:density="hdpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-port-ldpi/default.png" gap:platform="android" gap:density="ldpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-port-mdpi/default.png" gap:platform="android" gap:density="mdpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-port-xhdpi/default.png" gap:platform="android" gap:density="xhdpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-land-hdpi/default.png" gap:platform="android" gap:density="hdpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-land-ldpi/default.png" gap:platform="android" gap:density="ldpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-land-mdpi/default.png" gap:platform="android" gap:density="mdpi" />
+    <gap:splash src="assets/splash/android/images/res-notlong-land-xhdpi/default.png" gap:platform="android" gap:density="xhdpi" />
+    <!--    <icon src="icons/appicon.png" />
+    <icon src="icons/ios/appicon.png" gap:platform="ios" width="57" height="57" />
+    <icon src="icons/ios/appicon@2x.png" gap:platform="ios" width="114" height="114" />
+    <icon src="icons/ios/appicon-60.png" gap:platform="ios" width="60" height="60" />
+    <icon src="icons/ios/appicon-60@2x.png" gap:platform="ios" width="120" height="120" />
+    <icon src="icons/ios/appicon-72.png" gap:platform="ios" width="72" height="72" />
+    <icon src="icons/ios/appicon-72@2x.png" gap:platform="ios" width="144" height="144" />
+    <icon src="icons/ios/appicon-76.png" gap:platform="ios" width="76" height="76" />
+    <icon src="icons/ios/appicon-76@2x.png" gap:platform="ios" width="152" height="152" />
+
+    <icon src="icons/android/drawable-ldpi/appicon.png" gap:platform="android" gap:density="ldpi" />
+    <icon src="icons/android/drawable-mdpi/appicon.png" gap:platform="android" gap:density="mdpi" />
+    <icon src="icons/android/drawable-hdpi/appicon.png" gap:platform="android" gap:density="hdpi" />
+    <icon src="icons/android/drawable-xhdpi/appicon.png" gap:platform="android" gap:density="xhdpi" />
+    <icon src="icons/android/drawable-xxhdpi/appicon.png" gap:platform="android" gap:density="xxhdpi" />
+    -->
+<!--    <gap:splash src="splash/splash.png" />
+    <gap:splash src="splash/ios/Default.png" gap:platform="ios" width="320" height="480" />
+    <gap:splash src="splash/ios/Default@2x.png" gap:platform="ios" width="640" height="960" />
+    <gap:splash src="splash/ios/Default-568h@2x.png" gap:platform="ios" width="640" height="1136" />
+    <gap:splash src="splash/ios/Default-Portrait.png" gap:platform="ios" width="768" height="1024" />
+    <gap:splash src="splash/ios/Default-Landscape.png" gap:platform="ios" width="1024" height="748" />
+    <gap:splash src="splash/ios/Default-Portrait@2x.png" gap:platform="ios" width="1536" height="2048" />
+    <gap:splash src="splash/ios/Default-Landscape@2x.png" gap:platform="ios" width="2048" height="1536" />
+        
+    <gap:splash src="splash/android/res-notlong-port-ldpi/default.png" gap:platform="android" gap:density="ldpi" />
+    <gap:splash src="splash/android/res-notlong-port-mdpi/default.png" gap:platform="android" gap:density="mdpi" />
+    <gap:splash src="splash/android/res-notlong-port-hdpi/default.png" gap:platform="android" gap:density="hdpi" />
+    <gap:splash src="splash/android/res-notlong-port-xhdpi/default.png" gap:platform="android" gap:density="xhdpi" />-->
+
+    <access origin="*" subdomains="true" />
+    
+</widget>

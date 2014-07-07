@@ -1,0 +1,260 @@
+/*******
+from DownloadCtrl
+angular.module('MovieFish')
+
+var fileTransfer = new FileTransfer();
+
+fileTransfer.download(
+    url,
+    filePath,
+    function(entry) {
+        console.log("download complete: " + entry.fullPath);
+    },
+    function(error) {
+        console.log("download error source " + error.source);
+        console.log("download error target " + error.target);
+        console.log("upload error code" + error.code);
+    }
+);
+******/
+
+
+
+
+var test = function() {
+
+    var 
+    PLAYING_MEDIA_PATH = null,
+    stopOtherPlayingFile = function(path){
+        if(PLAYING_MEDIA_PATH !== path){
+            if(AllMedia[PLAYING_MEDIA_PATH])
+                AllMedia[PLAYING_MEDIA_PATH].stop();
+            PLAYING_MEDIA_PATH = path;
+        }
+    },
+    AllMedia = {},
+    
+    MediaTrack = function(path){
+        var 
+        _self = this,
+        playerInterval;       
+        this.duration = 0;
+        this.position = 0;
+        this.path = path;
+        this.mediaObj = null;
+        this.getDuration = function(callback){
+            
+            
+            var counter= 0;
+//            _self.mediaObj = new Media('file:///var/mobile/Applications/83D72F1D-A693-4B6F-9A4D-F26B5B04AF1F/Documents/Translations/monsters-ru.mp3'.replace(/^file:\/\/\//, ""));
+            if(_self.mediaObj)var normal_duration = _self.mediaObj.getDuration();
+            if(normal_duration && normal_duration > 0){
+                console.log('normal_duration'); console.log(normal_duration);
+                callback(Math.ceil(normal_duration));
+            }else{
+               _self.mediaObj.play();_self.mediaObj.stop();
+                var timerDur = setInterval(function() {
+                    counter = counter + 100;
+                    if (counter > 2000) {
+                        console.log('normal_duration false'); 
+                        clearInterval(timerDur);
+                    }
+                    var dur = _self.mediaObj.getDuration();
+                    if (dur > 0) {
+                        console.log('_duration'); console.log(dur);
+                        callback(Math.ceil(dur));
+                        clearInterval(timerDur);
+                    }
+                }, 100);
+            }
+            
+            
+            /*
+            
+            console.log('getDuration');
+            //if(!(callback && _self.mediaObj))return _self.throwError("getDuration failed");
+            console.log('getDuration2');
+            if(_self.mediaObj){_self.mediaObj.play();_self.mediaObj.stop();}
+            var
+            counter = 0,
+            timerDur = setInterval(function() {
+                counter = counter + 100;
+                if (counter > 2000)
+                    clearInterval(timerDur);
+                console.log("pre-dur");
+//                try{
+                    if(_self.mediaObj){
+                        _self.mediaObj.play();_self.mediaObj.stop();
+                        var dur = _self.mediaObj.getDuration();
+                    }
+                    
+                    console.log("dur");
+                    console.log(dur);
+//                }catch(e){
+//                    console.log("dur no");
+//                }
+                
+                if (dur && dur > 0) {
+                    console.log('getDuration2 callback');
+                    clearInterval(timerDur);
+                    callback(Math.ceil(dur));
+                }
+            }, 100);
+            */
+        };
+        this.init = function(callback){console.log('init');
+             if(_self.mediaObj !== null)_self.mediaObj.stop();
+                console.log('init2');
+//             try{
+                _self.mediaObj = new Media(_self.path, function(){
+                    console.log('new Media callback');
+                    
+               }, function(error) {
+                   callback({success: false, error: true});
+                   alert('code: ' + error.code + '\n' +
+                           'message: ' + error.message + '\n');
+               })
+               _self.getDuration(function(dur){
+                        _self.duration = dur;
+                        callback({
+                            success: true,
+                            duration: dur
+                        });
+                    });
+               /*
+                .successCallback(function(){
+                    console.log('new Media callback');
+                    _self.getDuration(function(dur){
+                        _self.duration = dur;
+                        callback({
+                            success: true,
+                            duration: dur
+                        });
+                    });
+               })
+                */
+//            }catch(e){
+//                _self.mediaObj = {
+//                    test: true
+//                };
+//                _self.duration = 300;
+//                callback({
+//                    success: true,
+//                    duration: 300
+//                });
+//            }
+        };
+        this.seekTo = function(time, callback) { // time need to * 1000
+//            try{
+                if(_self.mediaObj !== null){
+                    _self.mediaObj.seekTo(time * 1000, callback);
+                    _self.position = time;
+                }
+//            }catch(e){
+//                _self.position = time;
+//            }
+        };
+        this.seekToAndPlay = function(time) {
+            var _self = this;
+            this.seekTo(time, function() {
+                _self.play();
+            });
+        };
+        this.play = function() {
+            stopOtherPlayingFile(_self.path);
+            if(_self.mediaObj){
+//                try{
+                    _self.mediaObj.play({playAudioWhenScreenIsLocked: true});
+//                }catch(e){
+//                    console.log("fake play")
+//                }
+                _self.changeStatus("play");
+            }
+        };
+        this.pause = function() {
+            if(_self.mediaObj){
+//                try{
+                    _self.mediaObj.pause();
+//                }catch(e){
+//                    console.log("fake pause");
+//                }
+                _self.changeStatus("pause");
+            }
+        };
+        this.stop = function() {
+            if(_self.mediaObj){
+                _self.mediaObj.stop();
+                _self.changeStatus("stop");
+            }
+        };
+        this.throwError = function(msg){
+            console.log(msg);
+            return false;
+        };  
+        this.status = null;
+        this.changeStatus = function(status){
+            switch(status){
+                case "play":
+                    playerInterval = setInterval(function(){
+                        _self.position++;
+                    },1000);
+                    break;
+                case "stop":
+                    _self.position = 0;//and do the following step 'pause' ==> clearInterval\
+                    clearInterval(playerInterval);
+                case "pause":
+                    clearInterval(playerInterval);
+                    break;
+            }
+            _self.status = status;
+        };
+    };
+
+    return {
+        init: function(url, callback){
+            console.log("url");
+            console.log(url);
+            
+            console.log("not test_case");
+            if(!(url && callback))return false;
+            var _url = url.replace(/^file:\/\/\//, "");console.log("_url");console.log(_url);
+            if(AllMedia[_url]){console.log('AllMedia[_url]');console.log(AllMedia[_url]);
+                callback(AllMedia[_url]);
+            }else{
+                var media = new MediaTrack(_url);console.log('media');console.log(media);
+                media.init(function(result){
+                    AllMedia[_url] = media;
+                    callback(media);
+                });
+            }
+                
+            /*
+                console.log("test_case");
+                console.log(AllMedia);
+                var _url = "test_url";
+                if(AllMedia[_url]){
+                    console.log("AllMedia[_url]");
+                    console.log(AllMedia[_url]);
+                    callback(AllMedia[_url]);
+                }else{
+                    var media = new MediaTrack(_url);console.log('media');console.log(media);
+                    media.init(function(result){
+                        AllMedia[_url] = media;
+                        callback(media);
+                    });
+                }
+            */
+            
+        }
+    };
+    
+};
+
+var t = test();
+
+
+var m;
+t.init('file:///var/mobile/Applications/83D72F1D-A693-4B6F-9A4D-F26B5B04AF1F/Documents/Translations/monsters-ru.mp3'.replace(/^file:\/\/\//, ""), function(d){
+    console.log('d');
+    console.log(d);m=d;
+});

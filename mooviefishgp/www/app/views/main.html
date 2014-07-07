@@ -1,0 +1,27 @@
+<ion-view id="main" scroll="true" title="{{lang('Films')}}">
+    <ion-content>
+        <ion-refresher  on-refresh="doRefresh()"></ion-refresher>
+        <div class="container">
+            <div class="list">
+                <a href="#/menu/filminfo/{{film.id}}" ng-repeat="film in films"  class="item item-thumbnail-left">
+                    <div class="item-left" >
+                        
+                        <img class="listoffilms" src="{{film.img}}"/>
+                        <h2 class="name-of-film">{{film.title}}</h2>
+                        <div class="translations" ng-repeat="(k, tr) in film.translations">
+                            <p class="list-of-languages">{{tr.title}}</p>
+                            <img class="country-flag"  src="{{tr.img}}"/>
+                        
+                        </div>
+                    
+                        
+                        <p class="description">{{cropDescr(film.desc)}}</p>
+                 
+                    </div>
+                    
+                </a>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
+

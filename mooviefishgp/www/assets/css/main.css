@@ -1,0 +1,116 @@
+.item-left
+{
+    display:list-item;
+    float:left;
+}
+
+.item-left img.listoffilms{
+    float:left;
+    position:absolute;
+    top: 10px;
+    left: 10px;
+    width:70px;
+    clear:both;
+}
+.item-left .name-of-film{
+    white-space:normal;
+}
+.item-left .description{
+
+
+    white-space:normal;
+}
+.clear{
+    width: 100%;
+    height: 0px;
+    clear: both;
+}
+.item-left .description
+{
+    position:relative;
+   clear:both;
+   float:left;
+}
+.item-left .translations
+{
+    clear:both;
+}
+
+
+
+
+
+.container .list .item-thumbnail-left
+{
+    border:none;
+    
+    
+     background:#d3d3d3;
+    
+   background: linear-gradient(#000000, #575757);
+/* IE10 Consumer Preview */ 
+background: -ms-linear-gradient(top, #000000 0%, #575757 100%);
+
+/* Mozilla Firefox */ 
+background: -moz-linear-gradient(top, #000000 0%, #575757 100%);
+
+/* Opera */ 
+background: -o-linear-gradient(top, #000000 0%, #575757 100%);
+
+/* Webkit (Safari/Chrome 10) */ 
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #000000), color-stop(1, #575757));
+
+/* Webkit (Chrome 11+) */ 
+background: -webkit-linear-gradient(top, #000000 0%, #575757 100%);
+
+/* W3C Markup, IE10 Release Preview */ 
+background: linear-gradient(to bottom, #000000 0%, #575757 100%);
+    
+    
+    
+}
+#main
+{
+    background-color:1a1a1a;
+}
+.container .list .item-thumbnail-left .item-left .name-of-film
+{
+    font-size:20px;
+    color:#FFFFFF;
+    
+}
+.container .list .item-thumbnail-left .item-left .description
+{
+    
+    color:#FFFFFF;
+    font-family: MyriadPro Regular; 
+}
+.container .list .item-thumbnail-left .item-left .translations .list-of-languages
+{
+    
+    float:right;
+    color:#FFFFFF;
+    font-family: MyriadPro Regular; 
+}
+.container .list .item-thumbnail-left .item-left .translations .country-flag
+{
+    position:absolute;
+    float:left;
+    margin-right:5px;
+    width:20px;
+    height:20px;
+    border-radius:100px;
+
+
+}
+.container .list .item-thumbnail-left .item-left .translations
+{
+    float:right;
+    width:80px;
+}
+.logo
+{
+    
+    height:35px;
+    width:35px;
+}
