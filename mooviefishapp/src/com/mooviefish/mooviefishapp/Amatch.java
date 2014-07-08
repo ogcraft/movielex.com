@@ -26,13 +26,18 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.MediaPlayer.OnCompletionListener; 
-import android.media.MediaPlayer.OnErrorListener; 
-import android.media.MediaPlayer.OnPreparedListener;
-import android.media.MediaPlayer.OnSeekCompleteListener;
-import android.media.MediaPlayer;
+//import android.media.MediaPlayer.OnCompletionListener; 
+//import android.media.MediaPlayer.OnErrorListener; 
+//import android.media.MediaPlayer.OnPreparedListener;
+//import android.media.MediaPlayer.OnSeekCompleteListener;
+//import android.media.MediaPlayer;
 import android.media.MediaRecorder.AudioSource;
 import android.media.audiofx.AutomaticGainControl;
+
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.LibVlcException;
+import org.videolan.libvlc.MediaList;
+
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,8 +52,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
-public class Amatch implements 
-        OnPreparedListener, OnSeekCompleteListener, OnErrorListener {
+public class Amatch {
 	private static Amatch instance;
     private MFApplication gs; 
 	private String TAG = "Amatch";
@@ -65,6 +69,7 @@ public class Amatch implements
     public boolean isMediaPlayerReady = false;
     public boolean isMediaPlayerPlaying = false;
     
+    public Context mContext = null;
     private String data_root_path = "";
     private String track_keys_fn = data_root_path;
     private String translation_fn = data_root_path;
@@ -82,8 +87,8 @@ public class Amatch implements
     private long prepare_start_ms = 0;
     private long prepare_end_ms = 0;
 
-
-    private MediaPlayer mp = null;
+    LibVLC mLibVLC;
+    //private MediaPlayer mp = null;
     private RecorderThread recorder_thread;
     
     Handler player_thread_handler = new Handler() {
@@ -113,6 +118,8 @@ public class Amatch implements
                 Log.d(TAG,String.format("**** recording_time_ms: %d (%d - %d)", 
                                     recording_time_ms, recording_end_ms, recording_start_ms));
                 long calculated_ms = -1;
+                i = 1000;
+                calculated_ms = 6 * 1000;
                 if( i > 10 ) {
                     calculated_ms = (long)found_sec*1000 + recording_time_ms + 500; 
                 }
@@ -131,22 +138,23 @@ public class Amatch implements
             }
         }; 
 
-	public static Amatch initInstance(MFApplication app) {
+	public static Amatch initInstance(MFApplication app, Context context) {
 		if (instance == null) {
-			instance = new Amatch(app);
+			instance = new Amatch(app, context);
 		}
 		return instance;
 	}
 
-    private Amatch(MFApplication app) {
+    private Amatch(MFApplication app, Context context) {
         gs = app;
+        mContext = context;
         TAG = gs.getTAG();
         Log.d(TAG,"Amatch() constructor");
     }   
        
     public void Release(){
     	Log.d(TAG, "Amatch.Release()");
-    	mp.stop();
+    	mLibVLC.stop();
         if(recorder_thread != null){
             recorder_thread.finish();
             recorder_thread = null;
@@ -162,75 +170,47 @@ public class Amatch implements
         return n;
     }
 
-    void  createMediaPlayerForTranslation(String translation_fn) {
+void  createMediaPlayerForTranslation(String translation_fn) {
         Log.d(TAG,"Amatch.createMediaPlayerForTranslation: " + translation_fn); 
         isMediaPlayerPlaying = false;
-        if (mp == null) { 
-            Log.d(TAG,"Amatch.createMediaPlayerForTranslation: Creating new MediaPlayer");
-            mp = new  MediaPlayer(); 
- 
-            // Make sure the media player will acquire a wake-lock while playing. If we don't do
-            // that, the CPU might go to sleep while the song is playing, causing playback to stop.
-            //
-            // Remember that to use this, we have to declare the android.permission.WAKE_LOCK
-            // permission in AndroidManifest.xml.
-            mp.setWakeMode(gs.getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK); 
- 
-            // we want the media player to notify us when it's ready preparing, and when it's done
-            // playing:
-            mp.setOnPreparedListener(this); 
-            mp.setOnSeekCompleteListener(this);
-            mp.setOnErrorListener(this); 
+        if (mLibVLC == null) { 
+            Log.d(TAG,"Amatch.createMediaPlayerForTranslation: Initializing mLibVLC");
+            try {
+                mLibVLC = LibVLC.getInstance();
+                mLibVLC.init(mContext);
+            } catch(LibVlcException e) {
+                Toast.makeText(mContext,
+                    "Error initializing the libVLC multimedia framework!",
+                    Toast.LENGTH_LONG).show();
+                return;
+            }
         } 
         else  
-        {   Log.d(TAG,"Amatch.createMediaPlayerForTranslation: Reseting MediaPlayer");
+        {   Log.d(TAG,"Amatch.createMediaPlayerForTranslation: Reseting mLibVLC");
             isMediaPlayerReady = false;
-            mp.reset(); 
+            mLibVLC.restart(mContext); 
         }
-        prepare_start_ms = System.currentTimeMillis();
-        mp.reset();
-        try {
-            mp.setDataSource(translation_fn);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // Until the media player is prepared, we *cannot* call start() on it!
-        mp.prepareAsync(); 
-        
-    }
-    /** Called when media player is done preparing. */
-    @Override
-    public  void  onPrepared(MediaPlayer player) { 
-        isMediaPlayerReady = true;
-        // The media player is done preparing. That means we can start playing!
-        prepare_end_ms = System.currentTimeMillis();
-        Log.d(TAG, String.format("onPrepared(): prepare took: %d ms", prepare_end_ms - prepare_start_ms));
-        translationMaxDuration_ms = mp.getDuration();
+        //mLibVLC.getMediaList().insert(0, translation_fn);
+        //mLibVLC.playIndex(0);
+        translationMaxDuration_ms = (int) mLibVLC.getTime();
         Log.d(TAG,String.format("onPrepared(): Max Duration: ",translationMaxDuration_ms));
-    } 
+        isMediaPlayerReady = true; 
 
-    @Override
-    public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-        return false;    // Error -38 lol
     }
 
-    @Override
-    public void onSeekComplete(MediaPlayer mp) {
-        seek_end_ms = System.currentTimeMillis();
-        Log.d(TAG, String.format("onSeekComplete() seek to: %d took: %d ms", 
-            mp.getCurrentPosition(), seek_end_ms - seek_start_ms));
-        Log.d(TAG, String.format("From search_start_ms till seek_end ms: %d", seek_end_ms-matching_start_ms));
-        mp.setVolume(1.0f, 1.0f); // we can be loud 
-        isMediaPlayerPlaying = true;
-        mp.start();
-        translationMaxDuration_ms = mp.getDuration();
-        Log.d(TAG,String.format("onSeekComplete() translationMaxDuration_ms: %d", translationMaxDuration_ms));
-        
-    }
+//    @Override
+//    public void onSeekComplete(MediaPlayer mp) {
+//        seek_end_ms = System.currentTimeMillis();
+//        Log.d(TAG, String.format("onSeekComplete() seek to: %d took: %d ms", 
+//            mp.getCurrentPosition(), seek_end_ms - seek_start_ms));
+//        Log.d(TAG, String.format("From search_start_ms till seek_end ms: %d", seek_end_ms-matching_start_ms));
+//        mp.setVolume(1.0f, 1.0f); // we can be loud 
+//        isMediaPlayerPlaying = true;
+//        mp.start();
+//        translationMaxDuration_ms = mp.getDuration();
+//        Log.d(TAG,String.format("onSeekComplete() translationMaxDuration_ms: %d", translationMaxDuration_ms));
+//        
+//    }
 
     public long getTranslationMaxDuration() {
         return translationMaxDuration_ms;
@@ -249,7 +229,8 @@ public class Amatch implements
             seek_start_ms = System.currentTimeMillis();
             Log.d(TAG, "play_translation(): Seeking to " + from_ms);
             // Move song to particular second
-            mp.seekTo((int)from_ms); // position in milliseconds
+            mLibVLC.playMRL(fn);
+            mLibVLC.setTime(from_ms); // position in milliseconds
         
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -262,12 +243,12 @@ public class Amatch implements
         if(isMediaPlayerPlaying) 
         {
             isMediaPlayerPlaying = false;
-            mp.pause();
+            mLibVLC.pause();
         }
     }
 
     public long getCurrentTranslationPosition() {
-        return mp.getCurrentPosition();
+        return mLibVLC.getTime();
     }
 
     public void  play_recorded(){

@@ -47,7 +47,7 @@ import android.os.Build;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.1"; 
+	public static final String appVersion = "1.3s"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -105,7 +105,7 @@ public class MFApplication extends Application
             StrictMode.setThreadPolicy(policy); 
         }
         root_path = findRootPath();
-        amatch = Amatch.initInstance(this);
+        amatch = Amatch.initInstance(this, MFApplication.this);
         createMovieItems();
     }
 
