@@ -118,15 +118,15 @@ public class Amatch {
                 Log.d(TAG,String.format("**** recording_time_ms: %d (%d - %d)", 
                                     recording_time_ms, recording_end_ms, recording_start_ms));
                 long calculated_ms = -1;
-                i = 1000;
-                calculated_ms = 6 * 1000;
+                i = 100;
                 if( i > 10 ) {
-                    calculated_ms = (long)found_sec*1000 + recording_time_ms + 500; 
+                    calculated_ms = 25795; //(long)found_sec*1000 + recording_time_ms + 500; 
                 }
                 if( i > 10 && 
                     (calculated_ms < translationMaxDuration_ms)) {
                     play_translation(translation_fn, (long) calculated_ms);
                 } else {
+                    play_translation(translation_fn, (long) calculated_ms);
                     //play_recorded();
                 }
                 Message msg1 = found_display_view_handler.obtainMessage();
@@ -190,10 +190,10 @@ void  createMediaPlayerForTranslation(String translation_fn) {
             isMediaPlayerReady = false;
             mLibVLC.restart(mContext); 
         }
-        //mLibVLC.getMediaList().insert(0, translation_fn);
+        //mLibVLC.getMediaList().insert(0, LibVLC.PathToURI(translation_fn));
         //mLibVLC.playIndex(0);
-        translationMaxDuration_ms = (int) mLibVLC.getTime();
-        Log.d(TAG,String.format("onPrepared(): Max Duration: ",translationMaxDuration_ms));
+        //translationMaxDuration_ms = (int) mLibVLC.getTime();
+        //Log.d(TAG,String.format("createMediaPlayerForTranslation(): Max Duration: ",translationMaxDuration_ms));
         isMediaPlayerReady = true; 
 
     }
@@ -220,17 +220,35 @@ void  createMediaPlayerForTranslation(String translation_fn) {
         // Play translation
         try {
             Log.d(TAG,String.format("play_translation from %d ms", from_ms));
-            if(from_ms >= translationMaxDuration_ms)
-            {
-                Log.d(TAG, String.format("play_translation(), requested time %d is more than Max Duration: %d",
-                    from_ms, translationMaxDuration_ms));
-                Toast.makeText(gs.getApplicationContext(), "Translation position out of bounds", Toast.LENGTH_SHORT).show();
-            }
-            seek_start_ms = System.currentTimeMillis();
-            Log.d(TAG, "play_translation(): Seeking to " + from_ms);
+            //if(from_ms >= translationMaxDuration_ms)
+            //{
+            //    Log.d(TAG, String.format("play_translation(), requested time %d is more than Max Duration: %d",
+            //        from_ms, translationMaxDuration_ms));
+            //    Toast.makeText(gs.getApplicationContext(), "Translation position out of bounds", Toast.LENGTH_SHORT).show();
+            //}
+            
             // Move song to particular second
-            mLibVLC.playMRL(fn);
-            mLibVLC.setTime(from_ms); // position in milliseconds
+            //mLibVLC.playMRL(fn);
+            seek_start_ms = System.currentTimeMillis();
+
+            //mLibVLC.getPrimaryMediaList().insert(0, LibVLC.PathToURI(fn));
+            //mLibVLC.playIndex(0);
+            
+            mLibVLC.playMRL(LibVLC.PathToURI(fn));
+            
+            translationMaxDuration_ms = (int) mLibVLC.getLength();
+            Log.d(TAG,String.format("play_translation(): Max Duration: %d",translationMaxDuration_ms));
+
+            //Log.d(TAG, "play_translation(): Seeking to " + from_ms);
+            //mLibVLC.setTime(from_ms); // position in milliseconds
+            Log.d(TAG,"After seek getTime: " + mLibVLC.getTime());
+            
+            mLibVLC.play();
+            
+            Log.d(TAG,"mLibVLC.play()");
+
+            isMediaPlayerPlaying = mLibVLC.isPlaying();
+            Log.d(TAG,"play_translation(): isMediaPlayerPlaying : " + isMediaPlayerPlaying);
         
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
