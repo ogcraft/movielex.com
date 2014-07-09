@@ -6,4 +6,9 @@
 /Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/res/drawable-xhdpi/icon.png \
 /Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/res/values/strings.xml \
 /Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/res/xml/config.xml \
+/Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/ant-build/res/drawable/icon.png \
+/Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/ant-build/res/drawable-hdpi/icon.png \
+/Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/ant-build/res/drawable-ldpi/icon.png \
+/Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/ant-build/res/drawable-mdpi/icon.png \
+/Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/ant-build/res/drawable-xhdpi/icon.png \
 /Users/olegg/git/mooviefish.com/mooviefishpg/platforms/android/ant-build/AndroidManifest.xml \
