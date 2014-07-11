@@ -5,22 +5,23 @@ import android.net.Uri;
 
 
 public class MovieTranslations {
-    public String id;
+    public String file;
     public String title;
     public String desc;
     public String img;
-    //public String[] translations;
-
-    public MovieTranslations(String id, String title, String desc, String img) {
-        this.id = id;
+    public String lang;
+   
+    public MovieTranslations(String file, String title, String desc, String img, String lang) {
+        this.file = file;
         this.title = title;
         this.desc = desc;
         this.img = img;
+        this.lang = lang;
     }
     
     @Override
     public String toString() {
-        return id + "|" + title;
+        return "Trans: " + lang + "|" + title;
     }
 
     public Uri getImgUri() {

@@ -4,10 +4,6 @@
     <feature name="App">
         <param name="android-package" value="org.apache.cordova.App" />
     </feature>
-    <feature name="File">
-        <param name="android-package" value="org.apache.cordova.file.FileUtils" />
-        <param name="onload" value="true" />
-    </feature>
     <name>MoovieFish</name>
     <description>MoovieFish</description>
     <author email="info@mooviefish.com" href="http://www.mooviefish.com">MoovieFish</author>

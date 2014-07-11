@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingRight="10dp"
+    android:paddingLeft="10dp"
+    android:id="@+id/layout0" >
+    
+    <ImageView
+        android:id="@+id/mv_details_img"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:contentDescription="@string/image"
+        
+        android:paddingTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
+    <TextView
+        android:id="@+id/mv_title"
+        android:layout_height="wrap_content" 
+        android:layout_width="wrap_content" 
+        android:textColor="#fff"
+        android:layout_toRightOf="@+id/mv_details_img"
+        android:paddingBottom="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <TextView
+        android:id="@+id/mv_details_desc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mv_details_img"
+        android:paddingBottom="10dp"
+        android:textColor="#3399FF"
+        android:textSize="14dp" />
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/mv_details_desc"
+        android:orientation="vertical"
+        android:layout_centerVertical="true" >
+
+        <ProgressBar
+        android:id="@+id/mv_details_trans_progress1"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/mv_details_desc" 
+        style="?android:attr/progressBarStyleHorizontal" 
+        android:layout_margin="10dp" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/mv_details_trans_progress1"
+        android:orientation="horizontal"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:layout_centerHorizontal="true" >
+
+        <ImageView
+            android:id="@+id/mv_details_flag_img1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/flag_ru" />
+         
+        <TextView
+            android:id="@+id/mv_details_trans_title1"
+            android:layout_height="wrap_content" 
+            android:layout_width="100dp" 
+            android:paddingLeft="10dp"
+            android:textColor="#fff"
+            android:text="Русский"
+            android:textAppearance="?android:attr/textAppearanceLarge" /> 
+        <Button
+            android:id="@+id/mv_details_trans_get1"
+            android:layout_height="wrap_content" 
+            android:layout_width="fill_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@drawable/btn_background"
+            android:textColor="#000" />
+        
+        </LinearLayout>
+    </LinearLayout>
+   
+</RelativeLayout>

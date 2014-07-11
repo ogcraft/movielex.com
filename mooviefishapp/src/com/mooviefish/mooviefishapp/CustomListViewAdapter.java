@@ -11,7 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
- 
+import org.apache.commons.lang3.StringUtils;
+
 public class CustomListViewAdapter extends ArrayAdapter<MovieItem> {
  
     Context context;
@@ -31,7 +32,7 @@ public class CustomListViewAdapter extends ArrayAdapter<MovieItem> {
  
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        MovieItem MovieItem = getItem(position);
+        MovieItem movieItem = getItem(position);
  
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -45,10 +46,10 @@ public class CustomListViewAdapter extends ArrayAdapter<MovieItem> {
         } else
             holder = (ViewHolder) convertView.getTag();
  
-        holder.txtDesc.setText(MovieItem.desc);
-        holder.txtTitle.setText(MovieItem.title);
+        holder.txtDesc.setText(StringUtils.abbreviate(movieItem.desc, 100));
+        holder.txtTitle.setText(movieItem.title);
         //Log.d(TAG,"img uri: " +)
-        holder.imageView.setImageURI(MovieItem.getImgUri());
+        holder.imageView.setImageURI(movieItem.getImgUri());
  
         return convertView;
     }

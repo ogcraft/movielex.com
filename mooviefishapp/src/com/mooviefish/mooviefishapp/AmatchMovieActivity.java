@@ -185,7 +185,7 @@ public class AmatchMovieActivity extends Activity implements
             Log.d(TAG,"AmatchMovieActivity.load_fpkeys() Fails: selectedMovie is null");
 			return false;
 		}
-		String fn = gs.getRootPath() + selectedMovie.getFpkeysFileName();
+		String fn = ""; //gs.getRootPath() + selectedMovie.getFpkeysFileName();
         long keys = gs.amatch.load_fpkeys(fn);
         //String short_fn = fn.substring(data_root_path.length()+1);
 		boolean ret = gs.amatch.isFpkeysLoaded;
@@ -202,7 +202,7 @@ public class AmatchMovieActivity extends Activity implements
        int position, long id) {
         mv_list_view_position = position;
 		MovieTranslations tr = selectedMovie.translations.get(mv_list_view_position);	
-		load_translation_for_lang(tr.id);
+		load_translation_for_lang(selectedMovie.id);
 		mv_btn_start_search.setEnabled(true);
 
         //String  itemValue    = (String) mv_list_view.getItemAtPosition(mv_list_view_position); 

@@ -18,9 +18,23 @@ import org.json.JSONException;
 import android.util.Log; 
 import java.util.*;
 import java.util.regex.*;
+import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import android.text.TextUtils;
 import android.os.Build;
 import com.mooviefish.mooviefishapp.Amatch;
+import java.net.URL;
+import android.os.StrictMode;
+import android.os.Build;
+import org.apache.http.Header;
+//import org.json.*;
+//import com.loopj.android.http.*;
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 
 /**
 * This is a global state for MoovieFishApp
@@ -39,20 +53,33 @@ import com.mooviefish.mooviefishapp.Amatch;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.2"; 
+	public static final String appVersion = "1.2.2"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
     private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
+    static int CONNECTION_TIMEOUT = 0; //msec
+    static int DATARETRIEVAL_TIMEOUT = 0; //msec
+    static String moovifishSite = "http://mooviefish.com";
+    //static String moovifishSite = "http://192.168.10.109:3000";
+    static String dataLang = "ru";
+    static final String BASE_URL = "http://mooviefish.com";
+    static final String RESOURCE_PREFIX = BASE_URL + "/files/";
 
-	List<MovieItem> movieItems;
+    static final String GETMOVIES_REST = "%s/api/movies/%s";
+    static final String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%d";
 
-	public String getTAG() {
-		return TAG;
-	}
-	public String getRootPath() {
-		return root_path;
-	}
+    public AQuery aq = new AQuery(this);
+
+    public List<MovieItem> movieItems;
+
+    public String getTAG() {
+      return TAG;
+    }
+
+    public String getRootPath() {
+        return root_path;
+    }
 
     public String findRootPath() {
         final String mf_dir = "/MoovieFish/";
@@ -60,11 +87,11 @@ public class MFApplication extends Application
         String[] storages = getStorageDirectories();
 
         //Log.d(TAG,"findRootPath(): Found " + storages.size() + " path");
-        
+
         for (String s : storages) {
-            
+
             String p = s + mf_dir;
-            
+
             Log.d(TAG,"findRootPath(): checking: " + p);
 
             File f = new File(p);
@@ -80,137 +107,175 @@ public class MFApplication extends Application
     }
 
     @Override
-    public void onCreate()
-    {
-    	super.onCreate();
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT);
+
+        if( Build.VERSION.SDK_INT >= 9){
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy); 
+        }
+
+        amatch = Amatch.initInstance(MFApplication.this);
+
         root_path = findRootPath();
-        amatch = Amatch.initInstance(this);
-        createMovieItems();
+        //getMovieItems();
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-      StringBuilder sb = new StringBuilder();
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-       sb.append(line).append("\n");
-   }
-   reader.close();
-   return sb.toString();
-}
 
-public static String getStringFromFile (String filePath) throws Exception {
-  File fl = new File(filePath);
-  FileInputStream fin = new FileInputStream(fl);
-  String ret = convertStreamToString(fin);
-    //Make sure you close all streams.
-  fin.close();        
-  return ret;
-}
+    public static String getStringFromFile (String filePath) throws Exception {
+        File fl = new File(filePath);
+        FileInputStream fin = new FileInputStream(fl);
+        String ret = convertStreamToString(fin);
+        //Make sure you close all streams.
+        fin.close();        
+        return ret;
+    }
 
-public void createMovieItems() {
- JSONArray jsonarray = getJSONFromUrl("");
+    public void createMovieItemsFromJson(JSONArray jsonarray) {
+        Log.d(TAG, "createMovieItemsFromJson downloaded movies: " + jsonarray.length());
 
- movieItems = new ArrayList<MovieItem>();
+        movieItems = new ArrayList<MovieItem>();
 
- try {
-    for(int i=0;i<jsonarray.length();i++)
-    {
+        try {
+            for(int i=0;i<jsonarray.length();i++)
+            {
                 JSONObject c=jsonarray.getJSONObject(i);// Used JSON Object from Android
-                //Storing each Json in a string variable
-                String ID 	=c.getString("id");
-                String TITLE=c.getString("title");
-                String DESC =c.getString("desc");
-                String IMG  = getRootPath() + ID + "/" + c.getString("img");
-                Log.d(TAG,"JSON Parser IMG:" + IMG);
-                MovieItem mi = new MovieItem(ID,TITLE,DESC,IMG);
+                //Log.d(TAG, "JSON: " + c.toString());
+                MovieItem mi = new MovieItem(
+                    c.getString("id"), 
+                    c.getString("shortname"), 
+                    c.getString("title"), 
+                    c.getString("desc"), 
+                    c.getString("img"), 
+                    c.getString("fpkeys-file"));
+                String folder_name = root_path + mi.id;
+                MFApplication.createFolderForMovie(folder_name);
+                
+                mi.img = resolveResourceForMovie(mi.img, folder_name);
 
                 JSONArray trans_jsonarray = c.getJSONArray("translations");
                 Log.d(TAG,"trans: " + trans_jsonarray.length());
                 for(int j=0;j<trans_jsonarray.length();j++)
                 {
+
                   JSONObject t=trans_jsonarray.getJSONObject(j);
+                  //Log.d(TAG, "Trans: " + t.toString());
                   MovieTranslations mt = 
                   new MovieTranslations(
-                    t.getString("id"),
+                    t.getString("file"),
                     t.getString("title"), 
                     t.getString("desc"), 
-                    t.getString("img"));
-                  mi.translations.add(mt);
-              }
-              movieItems.add(mi);
-          }
-      } catch (JSONException e) {
-            // TODO Auto-generated catch block
-        e.printStackTrace();
-    }
-}
+                    t.getString("img"),
+                    t.getString("lang"));
 
-public JSONArray getJSONFromUrl(String url) {
- JSONArray jsonarr=null;
- String json = "";
- String json_fn = getRootPath() + "movie_list.json";
- try{
+                  mi.translations.add(mt);
+                }
+              
+                Log.d(TAG,"createMovieItemsFromJson(): adding " + mi.title);
+                movieItems.add(mi);
+            }
+            Log.d(TAG, "createMovieItemsFromJson() collected movies: " + movieItems.size());
+        } catch (JSONException e) {
+            Log.d(TAG, "createMovieItemsFromJson(): Json parsing failed");
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public String getFileNameForUrl(String url, String id) {
+        String fn = root_path + id + "/" + url.substring(url.lastIndexOf("/") + 1);
+        return fn;
+    }
+
+    public String resolveResourceForMovie(String url, String folder_name) {
+        Log.d(TAG, "resolveResourceForMovie(): url: " + url + " folder: " + folder_name);
+        
+        String fn = folder_name + "/" + url.substring(url.lastIndexOf("/") + 1);
+        Log.d(TAG, "resolveResourceForMovie(): fn: " + fn);
+        
+        File target = new File(fn);
+        if(!target.isFile()) {
+            AjaxCallback<File> cb = new AjaxCallback<File>();
+            
+            cb.url(url).type(File.class).targetFile(target);
+            
+            aq.sync(cb);
+        //File f = cb.getResult();
+
+            AjaxStatus status = cb.getStatus();
+            Log.d(TAG, "resolveResourceForMovie() After callback status: " + status.getCode());
+        }
+        return fn;  
+    }
+
+    public JSONArray getJSONFromUrl(String url) {
+        JSONArray jsonarr=null;
+        String json = "";
+        String json_fn = getRootPath() + "movie_list.json";
+        try {
     	// Making HTTP request
 
-     Log.d(TAG, "json_fn: " + json_fn);
-     json = getStringFromFile(json_fn);
-     Log.d(TAG, "json: " + json);
- } catch(Exception e) {
-  Log.d(TAG,"Failed read json: " + json_fn);
+           Log.d(TAG, "json_fn: " + json_fn);
+           json = getStringFromFile(json_fn);
+           Log.d(TAG, "json: " + json);
+        } catch(Exception e) {
+          Log.d(TAG,"Failed read json: " + json_fn);
     		//return null;
-  json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\", \"translations\": []}]";
-} 
+          json="[{\"id\": \"test\",\"title\": \"For Developers Only\",\"desc\": \" \",\"img\": \"stopsign.png\", \"translations\": []}]";
+        } 
     	// try parse the string to a JSONArray
-try {
-  jsonarr = new JSONArray(json);
-} catch (JSONException e) {
-  Log.d(TAG,"Failed parse json: " + json_fn);
-}
-
-    // return JSON String
-    return jsonarr;  //<<<< return JSONArray instead of JSONObject
-}
-
-
-public static HashSet<String> getStorageSet(){
-    HashSet<String> storageSet = getStorageSet(new File("/system/etc/vold.fstab"), true);
-    storageSet.addAll(getStorageSet(new File("/proc/mounts"), false));
-
-    if (storageSet == null || storageSet.isEmpty()) {
-        storageSet = new HashSet<String>();
-        storageSet.add(Environment.getExternalStorageDirectory().getAbsolutePath());
-    }
-    return storageSet;
-}
-
-public static HashSet<String> getStorageSet(File file, boolean is_fstab_file) {
-    HashSet<String> storageSet = new HashSet<String>();
-    BufferedReader reader = null;
-    try {
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            HashSet<String> _storage = null;
-            if (is_fstab_file) {
-                _storage = parseVoldFile(line);
-            } else {
-                _storage = parseMountsFile(line);
-            }
-            if (_storage == null)
-                continue;
-            storageSet.addAll(_storage);
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }finally{
         try {
-            reader.close();
+            jsonarr = new JSONArray(json);
+        } catch (JSONException e) {
+            Log.d(TAG,"Failed parse json: " + json_fn);
+        }
+
+        // return JSON String
+        return jsonarr;  //<<<< return JSONArray instead of JSONObject
+    }
+
+
+
+
+    public static HashSet<String> getStorageSet(){
+        HashSet<String> storageSet = getStorageSet(new File("/system/etc/vold.fstab"), true);
+        storageSet.addAll(getStorageSet(new File("/proc/mounts"), false));
+
+        if (storageSet == null || storageSet.isEmpty()) {
+            storageSet = new HashSet<String>();
+            storageSet.add(Environment.getExternalStorageDirectory().getAbsolutePath());
+        }
+        return storageSet;
+    }
+
+    public static HashSet<String> getStorageSet(File file, boolean is_fstab_file) {
+        HashSet<String> storageSet = new HashSet<String>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                HashSet<String> _storage = null;
+                if (is_fstab_file) {
+                    _storage = parseVoldFile(line);
+                } else {
+                    _storage = parseMountsFile(line);
+                }
+                if (_storage == null)
+                    continue;
+                storageSet.addAll(_storage);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        }   
-        reader = null;
-    }
+        }finally{
+            try {
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }   
+            reader = null;
+        }
             /*
              * set default external storage
              */
@@ -351,4 +416,26 @@ public static String[] getStorageDirectories()
     return rv.toArray(new String[rv.size()]);
 }
 
+public static boolean createFolderForMovie(String folder_name) {
+    
+    File folder = new File(folder_name);
+    Log.d(TAG, "Creating folder: " + folder_name);
+    boolean success = true;
+    if (!folder.exists()) {
+        success = folder.mkdirs();
     }
+    return success;
+}
+
+public static String convertStreamToString(InputStream is) throws Exception {
+  BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+  StringBuilder sb = new StringBuilder();
+  String line = null;
+  while ((line = reader.readLine()) != null) {
+     sb.append(line).append("\n");
+ }
+ reader.close();
+ return sb.toString();
+}
+
+}
