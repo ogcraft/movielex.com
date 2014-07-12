@@ -49,10 +49,6 @@ public class MovieItem {
         return "";
     }
 
-    //public String getFpkeysFileName() {
-    //    return (id + "/" + id + "-en.fpkeys");
-    //}
-
     public Uri getImgUri() {
         //String fn = Environment.getExternalStorageDirectory() + "/MoovieFish/" + desc;
         File file = new File(img); 

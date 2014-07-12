@@ -30,11 +30,14 @@ import java.net.URL;
 import android.os.StrictMode;
 import android.os.Build;
 import org.apache.http.Header;
-//import org.json.*;
-//import com.loopj.android.http.*;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.content.Context;
 
 /**
 * This is a global state for MoovieFishApp
@@ -53,7 +56,7 @@ import com.androidquery.callback.AjaxStatus;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.2.2"; 
+	public static final String appVersion = "1.3"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -62,7 +65,7 @@ public class MFApplication extends Application
     static int DATARETRIEVAL_TIMEOUT = 0; //msec
     static String moovifishSite = "http://mooviefish.com";
     //static String moovifishSite = "http://192.168.10.109:3000";
-    static String dataLang = "ru";
+    
     static final String BASE_URL = "http://mooviefish.com";
     static final String RESOURCE_PREFIX = BASE_URL + "/files/";
 
@@ -70,6 +73,7 @@ public class MFApplication extends Application
     static final String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%d";
 
     public AQuery aq = new AQuery(this);
+    public SharedPreferences sharedPrefs;
 
     public List<MovieItem> movieItems;
 
@@ -79,6 +83,14 @@ public class MFApplication extends Application
 
     public String getRootPath() {
         return root_path;
+    }
+    
+    public String getDataLang() {
+        return sharedPrefs.getString("data_lang", "ru");
+    }
+    
+    public String getTransLang() {
+        return sharedPrefs.getString("trans_lang", "ru");
     }
 
     public String findRootPath() {
@@ -106,6 +118,18 @@ public class MFApplication extends Application
         return mf_dir;
     }
 
+    public void cleanDownloadedData() {
+        String p = getRootPath();
+        Log.d(TAG,"MFApplication.cleanDownloadedData() cleaning " + p);
+        File dn = new File(p);
+        String [] children = dn.list();
+        for ( int i = 0 ; i < children.length ; i ++ )
+        {
+            File child = new File( dn, children[i] );
+            deleteDirectory(child);
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -117,6 +141,8 @@ public class MFApplication extends Application
         }
 
         amatch = Amatch.initInstance(MFApplication.this);
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         root_path = findRootPath();
         //getMovieItems();
@@ -197,9 +223,9 @@ public class MFApplication extends Application
         File target = new File(fn);
         if(!target.isFile()) {
             AjaxCallback<File> cb = new AjaxCallback<File>();
-            
+
             cb.url(url).type(File.class).targetFile(target);
-            
+
             aq.sync(cb);
         //File f = cb.getResult();
 
@@ -283,7 +309,7 @@ public class MFApplication extends Application
             return storageSet;
         }
 
-        private static HashSet<String> parseMountsFile(String str) {
+    private static HashSet<String> parseMountsFile(String str) {
             if (str == null)
                 return null;
             if (str.length()==0)
@@ -348,7 +374,7 @@ public class MFApplication extends Application
  * @return paths to all available SD-Cards in the system (include emulated)
  */
 
-public static String[] getStorageDirectories()
+    public static String[] getStorageDirectories()
 {
     // Final set of paths
     final Set<String> rv = new HashSet<String>();
@@ -437,5 +463,49 @@ public static String convertStreamToString(InputStream is) throws Exception {
  reader.close();
  return sb.toString();
 }
-
+/*
+public boolean isNetworkConnection() {
+    ConnectivityManager conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+    return netInfo != null;
 }
+*/
+
+public static void deleteFiles(String path, String regex) {
+    File file = new File(path);
+    if (file.exists()) {
+        String deleteCmd = "rm -fr " + path + regex;
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Log.d(TAG,"deleteFiles() exec cmd: " + deleteCmd);
+            runtime.exec(deleteCmd);
+        } catch (IOException e) { 
+            Log.d(TAG,"deleteFiles() Failed with " + e.getMessage());
+        }
+    } else {
+        Log.d(TAG,"deleteFiles() path: " + path + " not exists");
+    }
+}
+
+public static void deleteDirectory( File dir )
+{
+
+    if ( dir.isDirectory() )
+    {
+        String [] children = dir.list();
+        for ( int i = 0 ; i < children.length ; i ++ )
+        {
+         File child =    new File( dir , children[i] );
+         if(child.isDirectory()){
+             deleteDirectory( child );
+             child.delete();
+         }else{
+             child.delete();
+
+         }
+        }
+        dir.delete();
+    }
+}
+
+} // end of MVApplication

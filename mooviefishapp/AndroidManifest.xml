@@ -44,17 +44,26 @@
         android:screenOrientation="portrait" >
       </activity>
 
+      <activity 
+        android:name="com.mooviefish.mooviefishapp.SetPrefsActivity" 
+        android:label="@string/app_name"
+        android:screenOrientation="portrait">
+      </activity>
+
       <activity
         android:name="com.mooviefish.mooviefishapp.AmatchTestActivity"
         android:label="@string/app_name"
         android:screenOrientation="portrait" >
       </activity>
+
       
       <activity 
         android:label="@string/app_name" 
         android:name="com.lamerman.FileDialog"  
         android:screenOrientation="portrait">
       </activity>
+
+
       
     </application>
 

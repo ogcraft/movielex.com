@@ -26,15 +26,19 @@ import org.apache.http.Header;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import android.view.ViewGroup.LayoutParams;
 
 public class MainActivity extends Activity  implements
         OnItemClickListener 
 {
 	private MFApplication gs; 
-	private String TAG = "Moovie";
+	private String TAG = "MoovieFishApp";
     private final String test_id = "test";
     private ProgressDialog dialog;
     ListView listView;
@@ -54,11 +58,47 @@ public class MainActivity extends Activity  implements
         Log.d(TAG, "MainActivity.onCreate(): root_path: " + gs.getRootPath());
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Downloading movies...");
-        dialog.show();  
+        dialog.show();
         getMovieItems(); 
-  
+        
     }
-    
+
+    public void onDestroy(){
+        super.onDestroy();
+        Log.d(TAG, "MainActivity.onDestroy()");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.layout.menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Log.d(TAG, "going to SetPrefsActivity");
+                Intent prefActivity = new Intent(getApplicationContext(), SetPrefsActivity.class);
+                startActivity(prefActivity);
+                return true;
+            case R.id.menu_clear_cache:
+                gs.cleanDownloadedData();
+                return true;
+            case R.id.menu_about:
+                AboutDialog about = new AboutDialog(this);
+                about.setTitle("About this app");
+                about.show();
+                //about.getWindow().setLayout(300, 300);
+                return true;
+            case R.id.menu_exit:
+                super.onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public void showMovies() {
         listView = (ListView) findViewById(R.id.list);
         CustomListViewAdapter adapter = new CustomListViewAdapter(this,
@@ -118,7 +158,7 @@ public class MainActivity extends Activity  implements
         
     }
     public void getMovieItems() {
-        String getMoviesUrl = String.format(gs.GETMOVIES_REST, gs.BASE_URL, gs.dataLang);
+        String getMoviesUrl = String.format(gs.GETMOVIES_REST, gs.BASE_URL, gs.getDataLang());
         Log.d(TAG, "getMovieItems(): getMoviesUrl: " + getMoviesUrl);
         getMovieList(getMoviesUrl);
         Log.d(TAG, "getMovieItems(): Exit");
@@ -134,7 +174,7 @@ public class MainActivity extends Activity  implements
     		Intent testActivity = new Intent(getApplicationContext(), AmatchTestActivity.class);
         	startActivity(testActivity);
 		} else {
-            Log.d(TAG,"MainActivity.onItemClick() start AmatchMovieActivity");
+            Log.d(TAG,"MainActivity.onItemClick() start MovieDetailsActivity");
             Intent movieActivity = new Intent(getApplicationContext(), MovieDetailsActivity.class);
             
             movieActivity.putExtra(MovieDetailsActivity.MOVIE_POSITION, position);

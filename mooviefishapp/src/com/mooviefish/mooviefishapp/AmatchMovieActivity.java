@@ -55,11 +55,14 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
-public class AmatchMovieActivity extends Activity implements
-        OnItemClickListener {
+public class AmatchMovieActivity extends Activity {
     public static final String MOVIE_POSITION = "MOVIE_POSITION";
     private MFApplication gs; 
     private String TAG = "Moovie";
@@ -71,10 +74,10 @@ public class AmatchMovieActivity extends Activity implements
     private TextView    mv_progress_display_view;
     private SeekBar     mv_seekbar;
 	private TextView    mv_title_view;
+    private TextView    mv_play_desc;
+
     private TextView    mv_found_display_view;
     private Button      mv_btn_start_search;
-    private ListView    mv_list_view;
-	private int 		mv_list_view_position = -1;
     
 	Handler mv_found_display_view_handler = new Handler() {
         @Override
@@ -115,20 +118,18 @@ public class AmatchMovieActivity extends Activity implements
         
         gs = (MFApplication) getApplication();
         TAG = gs.getTAG();
-
+        Log.d(TAG, "AmatchMovieActivity.onCreate(): before setContentView");
         setContentView(R.layout.movie_view);
         
-        mv_seekbar = (SeekBar)findViewById(R.id.mv_seekbar);
-        mv_seekbar.setClickable(false);
-        
-        mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
         mv_title_view = (TextView)findViewById(R.id.mv_title);
+        mv_play_desc = (TextView)findViewById(R.id.mv_play_desc);
+        mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
+        
         mv_found_display_view = (TextView)findViewById(R.id.mv_found_display);
         mv_btn_start_search = (Button)findViewById(R.id.mv_btn_start_search);
 		mv_btn_start_search.setEnabled(false);
-        
-        
-		mv_list_view = (ListView) findViewById(R.id.mv_list);
+        mv_seekbar = (SeekBar)findViewById(R.id.mv_seekbar);
+        mv_seekbar.setClickable(false);
         
 		// Connect to handlers
         gs.amatch.found_display_view_handler    = mv_found_display_view_handler;
@@ -138,33 +139,25 @@ public class AmatchMovieActivity extends Activity implements
         movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
         Log.d(TAG,"AmatchMovieActivity.onCreate() movie_position: " + movie_position);
         
-        List<String> langs = new ArrayList<String>();
-
         if(movie_position != -1 || gs.movieItems == null) {
             selectedMovie = gs.movieItems.get(movie_position);
-            int sz = selectedMovie.translations.size();
-            for(int i=0; i<sz; i++)
-            {
-                langs.add(selectedMovie.translations.get(i).title);
-            }
         }
         
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-              android.R.layout.simple_list_item_1, android.R.id.text1, langs);
-        mv_list_view.setAdapter(adapter); 
-        mv_list_view.setOnItemClickListener(this);
-		if(selectedMovie == null) {
+        if(selectedMovie == null) {
             mv_title_view.setText("Movie Title");
         } else {
             mv_title_view.setText(selectedMovie.title);
+            mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
+            //mv_details_img.setImageURI(selectedMovie.getImgUri());
+            //mv_details_desc.setText(selectedMovie.desc);
+            if(load_fpkeys() && load_translation_for_lang("ru")) {
+                mv_found_display_view.setText("");
+                mv_btn_start_search.setEnabled(true);
+            } else {
+                Toast.makeText(getApplicationContext(),
+                    "Error: \"" + selectedMovie.id + "\" not found", Toast.LENGTH_LONG).show();
+            }
         }
-		if(load_fpkeys()) {
-			mv_found_display_view.setText("");
-		} else {
-        	Toast.makeText(getApplicationContext(),
-        		"Error: \"" + selectedMovie.id + "\" not found", Toast.LENGTH_LONG).show();
-		}
-
 		mv_found_display_view.setText("  \n  ");
 	}
 
@@ -172,10 +165,39 @@ public class AmatchMovieActivity extends Activity implements
     	super.onDestroy();
     	Log.d(TAG, "AmatchMovieActivity.onDestroy()");
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.layout.menu, menu);
+        return true;
+    }
 
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Log.d(TAG, "going to SetPrefsActivity");
+                Intent prefActivity = new Intent(getApplicationContext(), SetPrefsActivity.class);
+                startActivity(prefActivity);
+                return true;
+            case R.id.menu_clear_cache:
+                gs.cleanDownloadedData();
+                return true;
+            case R.id.menu_about:
+                AboutDialog about = new AboutDialog(this);
+                about.setTitle("About this app");
+                about.show();
+                return true;
+            case R.id.menu_exit:
+                super.onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 	public boolean load_translation_for_lang(String lang) {
-		String fn = gs.getRootPath() + selectedMovie.getTranslationFileName(lang);
-        Log.d(TAG, "AmatchMovieActivity: translation_fn: " + fn);
+		String fn = selectedMovie.getTranslationFileName(lang);
+        Log.d(TAG, "AmatchMovieActivity: translation fn: " + fn);
 		gs.amatch.createMediaPlayerForTranslation(fn);
 		return true;
 	}
@@ -185,9 +207,8 @@ public class AmatchMovieActivity extends Activity implements
             Log.d(TAG,"AmatchMovieActivity.load_fpkeys() Fails: selectedMovie is null");
 			return false;
 		}
-		String fn = ""; //gs.getRootPath() + selectedMovie.getFpkeysFileName();
+		String fn = gs.getFileNameForUrl(selectedMovie.fpkeys_file, selectedMovie.id);
         long keys = gs.amatch.load_fpkeys(fn);
-        //String short_fn = fn.substring(data_root_path.length()+1);
 		boolean ret = gs.amatch.isFpkeysLoaded;
         if(ret) {
             Log.d(TAG,"AmatchMovieActivity.load_fpkeys() Load: " + fn);
@@ -196,19 +217,6 @@ public class AmatchMovieActivity extends Activity implements
         }
 		return ret;
 	}
-    
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view,
-       int position, long id) {
-        mv_list_view_position = position;
-		MovieTranslations tr = selectedMovie.translations.get(mv_list_view_position);	
-		load_translation_for_lang(selectedMovie.id);
-		mv_btn_start_search.setEnabled(true);
-
-        //String  itemValue    = (String) mv_list_view.getItemAtPosition(mv_list_view_position); 
-        //Toast.makeText(getApplicationContext(),
-        //"\"" + itemValue + "\" not implemented yet", Toast.LENGTH_LONG).show();
-    }
 
     public void btn_start_searchClick(View view)
 	{

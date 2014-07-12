@@ -36,6 +36,7 @@ public class CustomListViewAdapter extends ArrayAdapter<MovieItem> {
  
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.list_item, null);
             holder = new ViewHolder();
@@ -43,8 +44,9 @@ public class CustomListViewAdapter extends ArrayAdapter<MovieItem> {
             holder.txtTitle = (TextView) convertView.findViewById(R.id.title);
             holder.imageView = (ImageView) convertView.findViewById(R.id.icon);
             convertView.setTag(holder);
-        } else
+        } else {
             holder = (ViewHolder) convertView.getTag();
+        }
  
         holder.txtDesc.setText(StringUtils.abbreviate(movieItem.desc, 100));
         holder.txtTitle.setText(movieItem.title);
