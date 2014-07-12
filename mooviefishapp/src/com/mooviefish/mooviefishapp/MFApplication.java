@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import android.util.Log; 
+import android.widget.Toast;
 import java.util.*;
 import java.util.regex.*;
 import java.io.IOException;
@@ -56,7 +57,7 @@ import android.content.Context;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.3"; 
+	public static final String appVersion = "1.3.2"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -94,6 +95,34 @@ public class MFApplication extends Application
     }
 
     public String findRootPath() {
+        Log.d(TAG, "android.os.Build.DEVICE: " + android.os.Build.DEVICE);
+        final String mf_dir = "/MoovieFish/";
+        String s = Environment.getExternalStorageDirectory().getPath();
+        if(android.os.Build.DEVICE.contains("Samsung") || android.os.Build.MANUFACTURER.contains("Samsung")){
+            s = s + "/external_sd/";
+        }
+        
+        String p = s + mf_dir;
+
+        Log.d(TAG,"findRootPath(): checking: " + p);
+
+        File f = new File(p);
+        if(f.exists() && f.isDirectory()){
+                Log.d(TAG, "findRootPath(): exists : "  + p);
+                return p;
+            }else{
+                String msg = "Location \"" + p + "\" does not exist. Creating";
+                Log.d(TAG,"findRootPath(): NOT EXIST: " + msg);
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                if(!f.mkdir()) {
+                    Log.d(TAG,"Directory is not created");
+                    Toast.makeText(getApplicationContext(), "Directory " + p + " is not created", Toast.LENGTH_LONG).show();
+                }
+            }
+        return mf_dir;
+    }
+
+    public String findRootPath1() {
         final String mf_dir = "/MoovieFish/";
         //HashSet<String> storages = getStorageSet();
         String[] storages = getStorageDirectories();
@@ -112,7 +141,13 @@ public class MFApplication extends Application
                 Log.d(TAG, "findRootPath(): exists : "  + p);
                 return p;
             }else{
-                Log.d(TAG,"findRootPath(): NOT EXIST: " + p);
+                String msg = "Location \"" + p + "\" does not exist. Creating";
+                Log.d(TAG,"findRootPath(): NOT EXIST: " + msg);
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                if(!f.mkdir()) {
+                    Log.d(TAG,"Directory is not created");
+                    Toast.makeText(getApplicationContext(), "Directory " + p + " is not created", Toast.LENGTH_LONG).show();
+                }
             }
         }
         return mf_dir;
