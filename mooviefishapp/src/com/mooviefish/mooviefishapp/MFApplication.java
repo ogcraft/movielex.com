@@ -27,7 +27,7 @@ import android.text.TextUtils;
 import android.os.Build;
 import com.mooviefish.mooviefishapp.Amatch;
 import java.net.URL;
-import android.os.StrictMode;
+//import android.os.StrictMode;
 import android.os.Build;
 import org.apache.http.Header;
 import android.content.SharedPreferences;
@@ -134,12 +134,12 @@ public class MFApplication extends Application
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT);
-
+/*
         if( Build.VERSION.SDK_INT >= 9){
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy); 
         }
-
+*/
         amatch = Amatch.initInstance(MFApplication.this);
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
