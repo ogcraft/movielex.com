@@ -18,7 +18,7 @@
     <string name="wait_synchronizing">Please wait\nSynchronizing...</string>
 	<string name="mediaplayer_not_ready">MediaPlayer still not ready</string>
 	
-	<string name="playing_info_fmt" formatted="false">Playing %2d:%02d:%02d from %2d:%02d:%02d</string>
+	<string name="playing_info_fmt" formatted="false">Playing %s from %s</string>
 	<string name="amatch_not_found_fmt" formatted="false">NotFound. Search took: %.02f sec.\n Please sync again</string>
 	<string name="amatch_found_fmt" formatted="false">Found sec: %.02f\n Search took: %.02f sec</string>
 

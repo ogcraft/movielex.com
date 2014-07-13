@@ -19,8 +19,8 @@
     <string name="wait_synchronizing">Пожалуйста подождите\nИдет синхронизация...</string>
 	<string name="mediaplayer_not_ready">MediaPlayer еше не готов. Повторите</string>
 	
-	<string name="playing_info_fmt" formatted="false">Проигрывается %2d:%02d:%02d из %2d:%02d:%02d</string>
-	<string name="amatch_not_found_fmt" formatted="false">Не синхронизированно. Поиск занял: %.02f сек.\n Пожалуйста повторите синхронизацию</string>
+	<string name="playing_info_fmt" formatted="false">Проигрывается %s из %s</string>
+	<string name="amatch_not_found_fmt" formatted="false">Не получилось. Поиск занял: %.02f сек.\n Пожалуйста повторите синхронизацию</string>
 	<string name="amatch_found_fmt" formatted="false">Синхронизированно на %.02f сек\n Поиск занял %.02f сек</string>
 
 	<string name="settings_set_presentation_lang">Изменить язык представления данных</string>

@@ -217,6 +217,16 @@ public class AmatchMovieActivity extends Activity {
         gs.amatch.stop_plaing_translation();
     }
     
+    static public String msToTimeFormat(long millis) {
+        String s = String.format("%02d:%02d:%02d", 
+            TimeUnit.MILLISECONDS.toHours(millis),
+            TimeUnit.MILLISECONDS.toMinutes(millis) - 
+            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+            TimeUnit.MILLISECONDS.toSeconds(millis) - 
+            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+        return s;
+    }
+
 	private Runnable UpdateTranslationTime = new Runnable() {
         public void run() {
             mv_seekbar.setMax((int)gs.amatch.getTranslationMaxDuration());
@@ -245,8 +255,8 @@ public class AmatchMovieActivity extends Activity {
             //        ));
             mv_progress_display_view.setText(
                     String.format(getString(R.string.playing_info_fmt),    
-                                    hour, min, sec,
-                                    duration_hour, duration_min, duration_sec));
+                                    msToTimeFormat(currentPlayingTime_ms),
+                                    msToTimeFormat(duration_ms)));
            
             mv_seekbar.setProgress((int)currentPlayingTime_ms);
             mv_seekbar_handler.postDelayed(this, 100);
