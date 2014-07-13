@@ -56,6 +56,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,10 +73,11 @@ public class AmatchMovieActivity extends Activity {
 	private String translation_fn = null;
     private int movie_position = -1;
     private MovieItem selectedMovie = null;
+    private ImageView   mv_sync_img;
     private TextView    mv_progress_display_view;
     private SeekBar     mv_seekbar;
 	private TextView    mv_title_view;
-    private TextView    mv_play_desc;
+    //private TextView    mv_play_desc;
 
     private TextView    mv_found_display_view;
     private Button      mv_btn_start_search;
@@ -120,16 +122,19 @@ public class AmatchMovieActivity extends Activity {
         gs = (MFApplication) getApplication();
         TAG = gs.getTAG();
         Log.d(TAG, "AmatchMovieActivity.onCreate(): before setContentView");
-        setContentView(R.layout.movie_view);
+        setContentView(R.layout.movie_sync_view);
+        ActionBar bar = getActionBar();
+        bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
         mv_title_view = (TextView)findViewById(R.id.mv_title);
-        mv_play_desc = (TextView)findViewById(R.id.mv_play_desc);
+        mv_sync_img = (ImageView)findViewById(R.id.mv_sync_img);
+        //mv_play_desc = (TextView)findViewById(R.id.mv_play_desc);
         mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
         
         mv_found_display_view = (TextView)findViewById(R.id.mv_found_display);
         mv_btn_start_search = (Button)findViewById(R.id.mv_btn_start_search);
 		mv_btn_start_search.setEnabled(false);
-        mv_seekbar = (SeekBar)findViewById(R.id.mv_seekbar);
+        mv_seekbar = (SeekBar)findViewById(R.id.mv_sync_seekbar);
         mv_seekbar.setClickable(false);
         
 		// Connect to handlers
@@ -146,11 +151,13 @@ public class AmatchMovieActivity extends Activity {
         
         if(selectedMovie == null) {
             mv_title_view.setText("   ");
+            bar.setTitle(R.string.main_view_title);
         } else {
+            bar.setTitle(R.string.main_view_title);
+            //bar.setTitle(selectedMovie.title);
             mv_title_view.setText(selectedMovie.title);
-            mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
-            //mv_details_img.setImageURI(selectedMovie.getImgUri());
-            //mv_details_desc.setText(selectedMovie.desc);
+            mv_sync_img.setImageURI(selectedMovie.getImgUri());
+            //mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
             if(load_fpkeys() && load_translation_for_lang("ru")) {
                 mv_found_display_view.setText("");
                 mv_btn_start_search.setEnabled(true);

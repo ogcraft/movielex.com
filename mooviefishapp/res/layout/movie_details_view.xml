@@ -19,7 +19,7 @@
         android:id="@+id/mv_title"
         android:layout_height="wrap_content" 
         android:layout_width="wrap_content" 
-        android:textColor="#fff"
+        android:textColor="#ffffff"
         android:layout_toRightOf="@+id/mv_details_img"
         android:paddingBottom="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -30,15 +30,15 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/mv_details_img"
         android:paddingBottom="10dp"
-        android:textColor="#3399FF"
+        android:textColor="#ffffff"
         android:textSize="14dp" />
 
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/layout1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/mv_details_desc"
         android:orientation="vertical"
         android:layout_centerVertical="true" >
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content" 
             android:layout_width="100dp" 
             android:paddingLeft="10dp"
-            android:textColor="#fff"
+            android:textColor="#ffffff"
             android:textAppearance="?android:attr/textAppearanceLarge" /> 
         <Button
             android:id="@+id/mv_details_trans_get1"
@@ -82,7 +82,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:background="@drawable/btn_background"
-            android:textColor="#fff" />
+            android:textColor="#ffffff" />
         </LinearLayout>
     </LinearLayout>
    

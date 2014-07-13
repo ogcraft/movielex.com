@@ -53,6 +53,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.ActionBar;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
@@ -95,6 +96,8 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         TAG = gs.getTAG();
         transLang = gs.getTransLang();
         setContentView(R.layout.movie_details_view);
+        ActionBar bar = getActionBar();
+        bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
         
         mv_details_img = (ImageView)findViewById(R.id.mv_details_img);
@@ -124,7 +127,10 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         //mv_list_view.setOnItemClickListener(this);
 		if(selectedMovie == null) {
             mv_title_view.setText("   ");
+            bar.setTitle(R.string.main_view_title);
         } else {
+            bar.setTitle(R.string.main_view_title);
+            //bar.setTitle(selectedMovie.title);
             mv_title_view.setText(selectedMovie.title);
             mv_details_img.setImageURI(selectedMovie.getImgUri());
             mv_details_desc.setText(selectedMovie.desc);

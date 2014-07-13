@@ -6,7 +6,7 @@
     <string name="image">Превью</string>
 
 	<string name="load_fpkeys">Загрузить индекс</string>
-	<string name="start_search">Синхронизировать</string>
+	<string name="start_search">Старт</string>
     <string name="stop">Стоп</string>
 
     <string name="download">Загрузить</string>
@@ -16,16 +16,24 @@
     <string name="ru_lang_name">Русский</string>
 
     <string name="still_in_progress_wait">Все еще синхронизируем. Пожалуйста подождите...</string>
-    <string name="wait_synchronizing">Пожалуйста подождите\nИдет синхронизация...</string>
+    <string name="wait_synchronizing">Идет синхронизация\nПожалуйста подождите...</string>
 	<string name="mediaplayer_not_ready">MediaPlayer еше не готов. Повторите</string>
 	
 	<string name="playing_info_fmt" formatted="false">Проигрывается %s из %s</string>
-	<string name="amatch_not_found_fmt" formatted="false">Не получилось. Поиск занял: %.02f сек.\n Пожалуйста повторите синхронизацию</string>
-	<string name="amatch_found_fmt" formatted="false">Синхронизированно на %.02f сек\n Поиск занял %.02f сек</string>
+	<string name="amatch_not_found_fmt" formatted="false">Ошибка синхронизации. Поиск занял: %.02f сек.\n Повторите попытку</string>
 
+	<string name="amatch_found_fmt" formatted="false">Синхронизированно на %.02f сек\n Поиск занял %.02f сек</string>
+<!--
+	<string name="amatch_found_fmt" formatted="false">Приятного просмотра!</string>
+-->	
 	<string name="settings_set_presentation_lang">Изменить язык представления данных</string>
 	<string name="settings_set_data_path">Изменить место сохранения данных</string>
-
+	
+	<string name="main_view_title">Фильмы</string>
+<!--	
+	<string name="details_view_title">Фильмы</string>
+	<string name="play_view_title">Фильмы</string>
+-->
 	<string name="menu_settings">Настройки</string>
 	<string name="menu_clear_cache">Удалить сохраненные данные</string>
 	<string name="menu_about">О программе</string>

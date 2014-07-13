@@ -34,6 +34,7 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import android.view.ViewGroup.LayoutParams;
 import android.os.Process;
+import android.app.ActionBar;
 
 public class MainActivity extends Activity  implements
         OnItemClickListener 
@@ -57,6 +58,10 @@ public class MainActivity extends Activity  implements
     	//Log.d(TAG,"MainActivity.onCreate");
         setContentView(R.layout.main);
         Log.d(TAG, "MainActivity.onCreate(): root_path: " + gs.getRootPath());
+        ActionBar bar = getActionBar();
+        bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
+        bar.setTitle(R.string.main_view_title);
+        
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Downloading movies...");
         dialog.show();
