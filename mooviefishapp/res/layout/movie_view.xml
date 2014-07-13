@@ -78,7 +78,7 @@
         android:textColor="#000"
         android:layout_marginTop="30dp"
         android:onClick="btn_stopClick"
-        android:text="Stop" />
+        android:text="@string/stop" />
     
 </LinearLayout>
 </RelativeLayout>

@@ -28,8 +28,9 @@ import android.text.TextUtils;
 import android.os.Build;
 import com.mooviefish.mooviefishapp.Amatch;
 import java.net.URL;
-//import android.os.StrictMode;
+import android.os.StrictMode;
 import android.os.Build;
+import android.os.Process;
 import org.apache.http.Header;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -57,7 +58,7 @@ import android.content.Context;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.3.2"; 
+	public static final String appVersion = "1.3.3"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -113,10 +114,10 @@ public class MFApplication extends Application
             }else{
                 String msg = "Location \"" + p + "\" does not exist. Creating";
                 Log.d(TAG,"findRootPath(): NOT EXIST: " + msg);
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                 if(!f.mkdir()) {
                     Log.d(TAG,"Directory is not created");
-                    Toast.makeText(getApplicationContext(), "Directory " + p + " is not created", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Directory " + p + " is not created", Toast.LENGTH_SHORT).show();
                 }
             }
         return mf_dir;
@@ -169,12 +170,12 @@ public class MFApplication extends Application
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT);
-/*
+
         if( Build.VERSION.SDK_INT >= 9){
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy); 
         }
-*/
+
         amatch = Amatch.initInstance(MFApplication.this);
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -193,10 +194,10 @@ public class MFApplication extends Application
         return ret;
     }
 
-    public void createMovieItemsFromJson(JSONArray jsonarray) {
+    public List<MovieItem> createMovieItemsFromJson(JSONArray jsonarray) {
         Log.d(TAG, "createMovieItemsFromJson downloaded movies: " + jsonarray.length());
 
-        movieItems = new ArrayList<MovieItem>();
+        ArrayList<MovieItem> movies = new ArrayList<MovieItem>();
 
         try {
             for(int i=0;i<jsonarray.length();i++)
@@ -210,6 +211,7 @@ public class MFApplication extends Application
                     c.getString("desc"), 
                     c.getString("img"), 
                     c.getString("fpkeys-file"));
+                
                 String folder_name = root_path + mi.id;
                 MFApplication.createFolderForMovie(folder_name);
                 
@@ -234,14 +236,15 @@ public class MFApplication extends Application
                 }
               
                 Log.d(TAG,"createMovieItemsFromJson(): adding " + mi.title);
-                movieItems.add(mi);
+                movies.add(mi);
             }
-            Log.d(TAG, "createMovieItemsFromJson() collected movies: " + movieItems.size());
+            Log.d(TAG, "createMovieItemsFromJson() collected movies: " + movies.size());
         } catch (JSONException e) {
             Log.d(TAG, "createMovieItemsFromJson(): Json parsing failed");
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return movies;
     }
 
     public String getFileNameForUrl(String url, String id) {

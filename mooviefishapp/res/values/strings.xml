@@ -2,11 +2,26 @@
 <resources>
     <string name="app_name">MoovieFish</string>
     <string name="amatch_test_name">MoovieFish Test View</string>
-    <string name="name">ListViewBaseAdapter</string>
+    
     <string name="image">Thumbnail</string>
 	<string name="load_fpkeys">Load Fpkeys</string>
 	<string name="start_search">Synchronize</string>
-    
+    <string name="stop">Stop</string>
+
+    <string name="download">Download</string>
+    <string name="downloading">Downloading...</string>
+    <string name="play">Play</string>
+
+    <string name="ru_lang_name">Russian</string>
+
+    <string name="still_in_progress_wait">Still in progress. Please wait...</string>
+    <string name="wait_synchronizing">Please wait\nSynchronizing...</string>
+	<string name="mediaplayer_not_ready">MediaPlayer still not ready</string>
+	
+	<string name="playing_info_fmt" formatted="false">Playing %2d:%02d:%02d from %2d:%02d:%02d</string>
+	<string name="amatch_not_found_fmt" formatted="false">NotFound. Search took: %.02f sec.\n Please sync again</string>
+	<string name="amatch_found_fmt" formatted="false">Found sec: %.02f\n Search took: %.02f sec</string>
+
 	<string name="settings_set_presentation_lang">Change Presentation Language</string>
 	<string name="settings_set_data_path">Change Data Path</string>
 
@@ -24,6 +39,7 @@
 	<string name="create">Save</string>
 	<string name="no_data">No Data</string>
 	<color  name="gray">#ffff0000</color>
+
 
 
 	

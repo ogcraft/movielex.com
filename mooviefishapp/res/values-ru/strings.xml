@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MoovieFish</string>
+    <string name="amatch_test_name">MoovieFish Test View</string>
+    
+    <string name="image">Превью</string>
+
+	<string name="load_fpkeys">Загрузить индекс</string>
+	<string name="start_search">Синхронизировать</string>
+    <string name="stop">Стоп</string>
+
+    <string name="download">Загрузить</string>
+    <string name="downloading">Загрузка...</string>
+    <string name="play">Слушать</string>
+
+    <string name="ru_lang_name">Русский</string>
+
+    <string name="still_in_progress_wait">Все еще синхронизируем. Пожалуйста подождите...</string>
+    <string name="wait_synchronizing">Пожалуйста подождите\nИдет синхронизация...</string>
+	<string name="mediaplayer_not_ready">MediaPlayer еше не готов. Повторите</string>
+	
+	<string name="playing_info_fmt" formatted="false">Проигрывается %2d:%02d:%02d из %2d:%02d:%02d</string>
+	<string name="amatch_not_found_fmt" formatted="false">Не синхронизированно. Поиск занял: %.02f сек.\n Пожалуйста повторите синхронизацию</string>
+	<string name="amatch_found_fmt" formatted="false">Синхронизированно на %.02f сек\n Поиск занял %.02f сек</string>
+
+	<string name="settings_set_presentation_lang">Изменить язык представления данных</string>
+	<string name="settings_set_data_path">Изменить место сохранения данных</string>
+
+	<string name="menu_settings">Настройки</string>
+	<string name="menu_clear_cache">Удалить сохраненные данные</string>
+	<string name="menu_about">О программе</string>
+	<string name="menu_exit">Выход</string>
+
+	<string name="location">Путь</string>
+	<string name="cant_read_folder">директория не может быть прочитанна</string>
+	<string name="nnew">Создать</string>
+	<string name="select">Выбрать</string>
+	<string name="file_name">Имя файла:</string>
+	<string name="cancel">Отменить</string>
+	<string name="create">Сохранить</string>
+	<string name="no_data">Нет данных</string>
+	<color  name="gray">#ffff0000</color>
+
+
+	
+</resources>

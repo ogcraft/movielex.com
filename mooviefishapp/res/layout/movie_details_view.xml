@@ -74,7 +74,6 @@
             android:layout_width="100dp" 
             android:paddingLeft="10dp"
             android:textColor="#fff"
-            android:text="Русский"
             android:textAppearance="?android:attr/textAppearanceLarge" /> 
         <Button
             android:id="@+id/mv_details_trans_get1"
@@ -84,7 +83,6 @@
             android:paddingRight="10dp"
             android:background="@drawable/btn_background"
             android:textColor="#000" />
-        
         </LinearLayout>
     </LinearLayout>
    

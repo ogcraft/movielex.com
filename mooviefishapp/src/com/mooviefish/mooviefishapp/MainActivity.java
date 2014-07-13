@@ -33,6 +33,7 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import android.view.ViewGroup.LayoutParams;
+import android.os.Process;
 
 public class MainActivity extends Activity  implements
         OnItemClickListener 
@@ -59,7 +60,7 @@ public class MainActivity extends Activity  implements
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Downloading movies...");
         dialog.show();
-        Toast.makeText(getApplicationContext(), "Path: " + gs.getRootPath(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Path: " + gs.getRootPath(), Toast.LENGTH_SHORT).show();
 
         getMovieItems(); 
         
@@ -94,7 +95,9 @@ public class MainActivity extends Activity  implements
                 //about.getWindow().setLayout(300, 300);
                 return true;
             case R.id.menu_exit:
-                super.onBackPressed();
+                //super.onBackPressed();
+                this.finish();
+                Process.killProcess( Process.myPid() ); 
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -132,14 +135,13 @@ public class MainActivity extends Activity  implements
         Log.d(TAG, "getMovieListCallback called");
         if(movies != null) {               
             Log.d(TAG, "getMovieListCallback(): Got movies: " + movies.length());
-            //gs.createMovieItemsFromJson(movies);
             final JSONArray _movies = movies;
             Thread thread = new Thread() {
                     @Override
                     public void run() {
                        
                         Log.d(TAG, "getMovieListCallback(): start Resource download thread");
-                        gs.createMovieItemsFromJson(_movies); 
+                        gs.movieItems = gs.createMovieItemsFromJson(_movies); 
                         Log.d(TAG, "getMovieListCallback(): Send message to resource_download_handler"); 
                         Message msg = resource_download_handler.obtainMessage();
                         Bundle bundle = new Bundle();

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="langs">
+    <item name="ru">Русский</item>
+    <item name="en">Английский</item>
+    <item name="ge">Немецкий</item>
+  </string-array>
+  <string-array name="langsValues">
+    <item name="ru">ru</item>
+    <item name="en">en</item>
+    <item name="ge">ge</item>
+  </string-array>
+</resources>

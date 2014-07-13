@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,6 +80,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     private ImageView   mv_details_img;
     private TextView    mv_details_desc;
 
+    private TextView    mv_details_trans_title1;
     private Button      mv_details_trans_get1;
     private TransState  trans_state1 = TransState.UNKNOWN;
     private ProgressBar mv_details_trans_progress1;
@@ -98,8 +100,10 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         mv_details_img = (ImageView)findViewById(R.id.mv_details_img);
         mv_title_view = (TextView)findViewById(R.id.mv_title);
         mv_details_desc = (TextView)findViewById(R.id.mv_details_desc);
+        mv_details_trans_title1 = (TextView)findViewById(R.id.mv_details_trans_title1);
+        mv_details_trans_title1.setText(R.string.ru_lang_name);
         mv_details_trans_get1 = (Button)findViewById(R.id.mv_details_trans_get1);
-        mv_details_trans_get1.setText("Загрузить");
+        mv_details_trans_get1.setText(R.string.download);
         mv_details_trans_get1.setOnClickListener(this);
         mv_details_trans_progress1 = (ProgressBar) findViewById(R.id.mv_details_trans_progress1);
         mv_details_trans_progress1.setVisibility(View.INVISIBLE);
@@ -119,14 +123,14 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         //mv_list_view.setAdapter(adapter); 
         //mv_list_view.setOnItemClickListener(this);
 		if(selectedMovie == null) {
-            mv_title_view.setText("Movie Title");
+            mv_title_view.setText("   ");
         } else {
             mv_title_view.setText(selectedMovie.title);
             mv_details_img.setImageURI(selectedMovie.getImgUri());
             mv_details_desc.setText(selectedMovie.desc);
             if( isFpkesExist() && isTranslationExist(transLang)) {
                 trans_state1 = TransState.DOWNLOADED;
-                mv_details_trans_get1.setText("Слушать"); 
+                mv_details_trans_get1.setText(R.string.play); 
             }
         }
 	}
@@ -134,36 +138,6 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     public void onDestroy(){
     	super.onDestroy();
     	Log.d(TAG, "MovieDetailsActivity.onDestroy()");
-    }
-   
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.layout.menu, menu);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Log.d(TAG, "going to SetPrefsActivity");
-                Intent prefActivity = new Intent(getApplicationContext(), SetPrefsActivity.class);
-                startActivity(prefActivity);
-                return true;
-            case R.id.menu_clear_cache:
-                gs.cleanDownloadedData();
-                return true;
-            case R.id.menu_about:
-                AboutDialog about = new AboutDialog(this);
-                about.setTitle("about this app");
-                about.show();
-                return true;
-            case R.id.menu_exit:
-                super.onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     public void onClick(View v) {
@@ -196,7 +170,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                     startActivity(movieActivity);
                 } else {
                     trans_state1 = TransState.UNKNOWN;
-                    mv_details_trans_get1.setText("Загрузить"); 
+                    mv_details_trans_get1.setText(R.string.download); 
                 }
                 break;
             case DOWNLOADING:
@@ -223,7 +197,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 			return false;
 		}
         trans_state1 = TransState.DOWNLOADING;
-        mv_details_trans_get1.setText("Загрузка...");
+        mv_details_trans_get1.setText(R.string.downloading);
 		String fn = gs.getFileNameForUrl(selectedMovie.fpkeys_file, selectedMovie.id);
 
         Log.d(TAG,"MovieDetailsActivity.load_fpkeys() fn: " + fn);
@@ -248,7 +222,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                     if(file != null){
                         Log.d(TAG, " Downloaded File:" + file.length() + ":" + file);
                         trans_state1 = TransState.DOWNLOADED;
-                        mv_details_trans_get1.setText("Слушать");
+                        mv_details_trans_get1.setText(R.string.play);
                         if(fpkey_download_dialog != null) {
                             fpkey_download_dialog.dismiss();   
                         }
@@ -256,7 +230,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                     }else{
                         Log.d(TAG, "Failed download: "  + selectedMovie.fpkeys_file);
                         trans_state1 = TransState.UNKNOWN;
-                        mv_details_trans_get1.setText("Загрузить");
+                        mv_details_trans_get1.setText(R.string.download);
                         if(fpkey_download_dialog != null) {
                             fpkey_download_dialog.dismiss();   
                         }
@@ -280,7 +254,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         final String url = selectedMovie.getTranslationFileName(lang);
         Log.d(TAG, "MovieDetailsActivity.load_translation_for_lang: url: " + url);
         trans_state1 = TransState.DOWNLOADING;
-        mv_details_trans_get1.setText("Загрузка...");
+        mv_details_trans_get1.setText(R.string.downloading);
         String fn = gs.getFileNameForUrl(url, selectedMovie.id);
 
         Log.d(TAG,"MovieDetailsActivity.load_translation_for_lang() fn: " + fn);
@@ -310,11 +284,11 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                             trans_download_dialog.dismiss(); 
                         }
                         trans_state1 = TransState.DOWNLOADED;
-                        mv_details_trans_get1.setText("Слушать");
+                        mv_details_trans_get1.setText(R.string.play);
                     }else{
                         Log.d(TAG, "Failed download: "  + url);
                         trans_state1 = TransState.UNKNOWN;
-                        mv_details_trans_get1.setText("Загрузить");
+                        mv_details_trans_get1.setText(R.string.download);
                         if(trans_download_dialog != null) {
                             trans_download_dialog.dismiss(); 
                         }
@@ -327,7 +301,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                 trans_download_dialog.dismiss();
             }
             trans_state1 = TransState.DOWNLOADED;
-            mv_details_trans_get1.setText("Слушать");
+            mv_details_trans_get1.setText(R.string.play);
             Log.d(TAG, "File " + fn + " exist");
         } 
         return true;

@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -88,10 +89,10 @@ public class AmatchMovieActivity extends Activity {
             if(mv_found_display_view != null) {
                 String s = null;
                 if(found_ms > 0) {
-                   s = String.format("Found sec: %f\n Search took: %f sec", 
+                   s = String.format(getString(R.string.amatch_found_fmt), 
                     found_ms/1000.0, search_duration_ms/1000.0);     
                 } else {
-                   s = String.format("NotFound. Search took: %f sec.\n Please sync again",
+                   s = String.format(getString(R.string.amatch_not_found_fmt),
                     search_duration_ms/1000.0);     
                 }
                 mv_found_display_view.setText(s);
@@ -139,12 +140,12 @@ public class AmatchMovieActivity extends Activity {
         movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
         Log.d(TAG,"AmatchMovieActivity.onCreate() movie_position: " + movie_position);
         
-        if(movie_position != -1 || gs.movieItems == null) {
+        if(movie_position != -1 && gs.movieItems != null) {
             selectedMovie = gs.movieItems.get(movie_position);
         }
         
         if(selectedMovie == null) {
-            mv_title_view.setText("Movie Title");
+            mv_title_view.setText("   ");
         } else {
             mv_title_view.setText(selectedMovie.title);
             mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
@@ -154,8 +155,9 @@ public class AmatchMovieActivity extends Activity {
                 mv_found_display_view.setText("");
                 mv_btn_start_search.setEnabled(true);
             } else {
-                Toast.makeText(getApplicationContext(),
-                    "Error: \"" + selectedMovie.id + "\" not found", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),
+                //    "Error: \"" + selectedMovie.id + "\" not found", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Error: \"" + selectedMovie.id + "\" not found");
             }
         }
 		mv_found_display_view.setText("  \n  ");
@@ -166,35 +168,6 @@ public class AmatchMovieActivity extends Activity {
     	Log.d(TAG, "AmatchMovieActivity.onDestroy()");
     }
     
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.layout.menu, menu);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Log.d(TAG, "going to SetPrefsActivity");
-                Intent prefActivity = new Intent(getApplicationContext(), SetPrefsActivity.class);
-                startActivity(prefActivity);
-                return true;
-            case R.id.menu_clear_cache:
-                gs.cleanDownloadedData();
-                return true;
-            case R.id.menu_about:
-                AboutDialog about = new AboutDialog(this);
-                about.setTitle("About this app");
-                about.show();
-                return true;
-            case R.id.menu_exit:
-                super.onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 	public boolean load_translation_for_lang(String lang) {
 		String fn = selectedMovie.getTranslationFileName(lang);
         Log.d(TAG, "AmatchMovieActivity: translation fn: " + fn);
@@ -224,16 +197,16 @@ public class AmatchMovieActivity extends Activity {
 		if(!gs.amatch.isMediaPlayerReady)
 		{
 			Log.d(TAG,"btn_start_searchClick(): MediaPlayer still not Ready.");
-			Toast.makeText(getApplicationContext(), "MediaPlayer still not Ready.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), R.string.mediaplayer_not_ready, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		if(gs.amatch.isMatching)
 		{
-			Toast.makeText(getApplicationContext(), "Still in progress. Please wait...", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), R.string.still_in_progress_wait, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		mv_found_display_view.setText("Please wait.\nSynchronizing...");
-		//seekbar.setMax(gs.amatch.getTranslationMaxDuration());
+		mv_found_display_view.setText(R.string.wait_synchronizing);
+		
 		mv_seekbar.setProgress(0);
 		mv_seekbar_handler.postDelayed(UpdateTranslationTime,100);
 		gs.amatch.start_recording_thread();
@@ -248,16 +221,32 @@ public class AmatchMovieActivity extends Activity {
         public void run() {
             mv_seekbar.setMax((int)gs.amatch.getTranslationMaxDuration());
             long currentPlayingTime_ms = gs.amatch.getCurrentTranslationPosition();
-            long min = TimeUnit.MILLISECONDS.toMinutes((long) currentPlayingTime_ms);
+            
+            long hour = TimeUnit.MILLISECONDS.toHours((long) currentPlayingTime_ms);
+            long min = TimeUnit.MILLISECONDS.toMinutes((long) currentPlayingTime_ms)- 
+                   TimeUnit.MINUTES.toMinutes(TimeUnit.MILLISECONDS.toHours((long) currentPlayingTime_ms));
             long sec = TimeUnit.MILLISECONDS.toSeconds((long) currentPlayingTime_ms) - 
                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) currentPlayingTime_ms));
+            
+            long duration_ms = gs.amatch.getTranslationMaxDuration();
+
+            long duration_hour = TimeUnit.MILLISECONDS.toHours((long) duration_ms);
+            long duration_min = TimeUnit.MILLISECONDS.toMinutes((long) duration_ms)- 
+                   TimeUnit.MINUTES.toMinutes(TimeUnit.MILLISECONDS.toHours((long) duration_ms));
+            long duration_sec = TimeUnit.MILLISECONDS.toSeconds((long) duration_ms) - 
+                   TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) duration_ms));
+            
            
+            //mv_progress_display_view.setText(
+            //         String.format("Playing %.2f ( %2d:%02d:%02d ) sec from %.2f sec", 
+            //                         currentPlayingTime_ms / 1000.0,
+            //                         hour, min, sec,
+            //                         gs.amatch.getTranslationMaxDuration() / 1000.0
+            //        ));
             mv_progress_display_view.setText(
-                   String.format("Playing %.2f ( %3d:%02d ) sec from %.2f sec",
-                                    currentPlayingTime_ms / 1000.0,
-                                    min, sec,
-                                    gs.amatch.getTranslationMaxDuration() / 1000.0
-                   ));
+                    String.format(getString(R.string.playing_info_fmt),    
+                                    hour, min, sec,
+                                    duration_hour, duration_min, duration_sec));
            
             mv_seekbar.setProgress((int)currentPlayingTime_ms);
             mv_seekbar_handler.postDelayed(this, 100);
