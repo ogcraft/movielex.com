@@ -58,7 +58,7 @@ import android.content.Context;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.3.3"; 
+	public static final String appVersion = "1.3.4"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;

@@ -82,7 +82,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:background="@drawable/btn_background"
-            android:textColor="#000" />
+            android:textColor="#fff" />
         </LinearLayout>
     </LinearLayout>
    
