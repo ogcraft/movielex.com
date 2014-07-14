@@ -164,6 +164,10 @@ public class MFApplication extends Application
             File child = new File( dn, children[i] );
             deleteDirectory(child);
         }
+        File json_file = new File(p + "movies.json" );
+		if(json_file != null) {
+			json_file.delete();
+		}
     }
 
     @Override
@@ -272,6 +276,30 @@ public class MFApplication extends Application
         }
         return fn;  
     }
+
+	public JSONArray getJSONFromFile( File fl) {
+		JSONArray jsonarr=null;
+		String json = "";
+		try {
+			Log.d(TAG, "getJSONFromFile(): " + fl.getPath());
+			//json = getStringFromFile(json_fn);
+        	FileInputStream fin = new FileInputStream(fl);
+        	json = convertStreamToString(fin);
+			//Make sure you close all streams.
+			fin.close();        
+			Log.d(TAG, "json: " + json);
+		} catch(Exception e) {
+			Log.d(TAG,"getJSONFromFile() Failed read json: " + fl.getPath());
+			return null;
+		} 
+		// try parse the string to a JSONArray
+		try {
+			jsonarr = new JSONArray(json);
+		} catch (JSONException e) {
+			Log.d(TAG,"Failed parse json: " + fl.getPath());
+		}
+		return jsonarr;
+	}
 
     public JSONArray getJSONFromUrl(String url) {
         JSONArray jsonarr=null;

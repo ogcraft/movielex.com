@@ -74,7 +74,9 @@ public class AmatchMovieActivity extends Activity {
     private int movie_position = -1;
     private MovieItem selectedMovie = null;
     private ImageView   mv_sync_img;
-    private TextView    mv_progress_display_view;
+    //private TextView    mv_progress_display_view;
+    private TextView    mv_sync_play_time_left;
+    private TextView    mv_sync_play_time_right;
     private SeekBar     mv_seekbar;
 	private TextView    mv_title_view;
     //private TextView    mv_play_desc;
@@ -129,7 +131,9 @@ public class AmatchMovieActivity extends Activity {
         mv_title_view = (TextView)findViewById(R.id.mv_title);
         mv_sync_img = (ImageView)findViewById(R.id.mv_sync_img);
         //mv_play_desc = (TextView)findViewById(R.id.mv_play_desc);
-        mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
+        //mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
+        mv_sync_play_time_left = (TextView)findViewById(R.id.mv_sync_play_time_left);
+        mv_sync_play_time_right = (TextView)findViewById(R.id.mv_sync_play_time_right);
         
         mv_found_display_view = (TextView)findViewById(R.id.mv_found_display);
         mv_btn_start_search = (Button)findViewById(R.id.mv_btn_start_search);
@@ -253,17 +257,12 @@ public class AmatchMovieActivity extends Activity {
             long duration_sec = TimeUnit.MILLISECONDS.toSeconds((long) duration_ms) - 
                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) duration_ms));
             
-           
             //mv_progress_display_view.setText(
-            //         String.format("Playing %.2f ( %2d:%02d:%02d ) sec from %.2f sec", 
-            //                         currentPlayingTime_ms / 1000.0,
-            //                         hour, min, sec,
-            //                         gs.amatch.getTranslationMaxDuration() / 1000.0
-            //        ));
-            mv_progress_display_view.setText(
-                    String.format(getString(R.string.playing_info_fmt),    
-                                    msToTimeFormat(currentPlayingTime_ms),
-                                    msToTimeFormat(duration_ms)));
+            //        String.format(getString(R.string.playing_info_fmt),    
+            //                        msToTimeFormat(currentPlayingTime_ms),
+            //                        msToTimeFormat(duration_ms)));
+            mv_sync_play_time_left.setText(msToTimeFormat(currentPlayingTime_ms));
+            mv_sync_play_time_right.setText(msToTimeFormat(duration_ms));
            
             mv_seekbar.setProgress((int)currentPlayingTime_ms);
             mv_seekbar_handler.postDelayed(this, 100);

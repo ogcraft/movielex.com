@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
+import java.io.File;
+import java.io.FileInputStream;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView.OnItemClickListener;
@@ -35,6 +37,8 @@ import com.androidquery.callback.AjaxStatus;
 import android.view.ViewGroup.LayoutParams;
 import android.os.Process;
 import android.app.ActionBar;
+import java.util.Timer;  
+import java.util.TimerTask; 
 
 public class MainActivity extends Activity  implements
         OnItemClickListener 
@@ -129,43 +133,49 @@ public class MainActivity extends Activity  implements
     }; 
 
     public void getMovieList(String serviceUrl) {
-        Log.d(TAG, "getMovieList(): url: " + serviceUrl);
-        AjaxCallback<JSONArray> cb = new AjaxCallback<JSONArray>();        
-        cb.url(serviceUrl).type(JSONArray.class).weakHandler(this, "getMovieListCallback");
+        File target = new File(gs.getRootPath()+"movies.json");
+        Log.d(TAG, "getMovieList(): url: " + serviceUrl + " -> " + target.getPath());
+        AjaxCallback<File> cb = new AjaxCallback<File>();        
+        cb.url(serviceUrl).type(File.class).weakHandler(this, "getMovieListCallback").targetFile(target);
         cb.header("Content-Type", "application/json");  
+        int DOWNLOAD_TO_MS = 10*1000; //in ms  
+		cb.setTimeout(DOWNLOAD_TO_MS);
         gs.aq.ajax(cb);
     }
 
-    public void getMovieListCallback(String url, JSONArray movies, AjaxStatus status){
+    public void getMovieListCallback(String url, File file, AjaxStatus status){
         Log.d(TAG, "getMovieListCallback called");
-        if(movies != null) {               
-            Log.d(TAG, "getMovieListCallback(): Got movies: " + movies.length());
-            final JSONArray _movies = movies;
-            Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                       
-                        Log.d(TAG, "getMovieListCallback(): start Resource download thread");
-                        gs.movieItems = gs.createMovieItemsFromJson(_movies); 
-                        Log.d(TAG, "getMovieListCallback(): Send message to resource_download_handler"); 
-                        Message msg = resource_download_handler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putBoolean("DownloadStatus", true);
-                        msg.setData(bundle);
-                        resource_download_handler.sendMessage(msg);
-                    }
-            };
-            
-            thread.start();
-            //try {
-            //thread.join();
-            //} catch (InterruptedException e) {}
-                  
-        } else {          
-            Log.d(TAG, "getMovieListCallback failed");
+		File json_file = null;
+        if(!(file != null && file.length() > 10)) {               
+        	json_file = new File(gs.getRootPath()+"movies.json");
+			Log.d(TAG,"getMovieListCallback() failed fetch JSON. Using stored ");
         }
         
+        if(!(json_file != null && json_file.length() > 10)) {               
+			Log.d(TAG,"getMovieListCallback() failed exit");
+			return;
+        }
+		final JSONArray _movies = gs.getJSONFromFile(json_file);
+		if(_movies != null) {
+			Log.d(TAG, "getMovieListCallback(): Got movies: " + _movies.length());
+			Thread thread = new Thread() {
+				@Override
+				public void run() {
+
+					Log.d(TAG, "getMovieListCallback(): start Resource download thread");
+					gs.movieItems = gs.createMovieItemsFromJson(_movies); 
+					Log.d(TAG, "getMovieListCallback(): Send message to resource_download_handler"); 
+					Message msg = resource_download_handler.obtainMessage();
+					Bundle bundle = new Bundle();
+					bundle.putBoolean("DownloadStatus", true);
+					msg.setData(bundle);
+					resource_download_handler.sendMessage(msg);
+				}
+			};
+			thread.start();
+		}
     }
+
     public void getMovieItems() {
         String getMoviesUrl = String.format(gs.GETMOVIES_REST, gs.BASE_URL, gs.getDataLang());
         Log.d(TAG, "getMovieItems(): getMoviesUrl: " + getMoviesUrl);
