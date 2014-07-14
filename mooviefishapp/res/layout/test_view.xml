@@ -20,8 +20,7 @@
         android:gravity="center" 
         android:textColor="#fff"
         android:layout_marginTop="10dp"
-        android:text="                "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:text="                "/>
 
     <Button
         android:id="@+id/btn_load_fpkeys"
@@ -53,8 +52,7 @@
         android:gravity="center" 
         android:textColor="#fff"
         android:layout_marginTop="20dp"        
-        android:text="                      "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:text="                      "/>
     
     <Button
         android:id="@+id/btn_start_search"
@@ -74,8 +72,7 @@
         android:gravity="center" 
         android:textColor="#fff"
         android:layout_marginTop="20dp"        
-        android:text="                      "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:text="                      "/>
 	
 	<SeekBar
         android:id="@+id/seekbar"

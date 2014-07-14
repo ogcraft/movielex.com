@@ -20,8 +20,8 @@
         android:gravity="center" 
         android:textColor="#fff"
         android:layout_marginTop="10dp"
-        android:text="                "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:text="                "
+		android:textAppearance="?android:attr/textAppearanceMedium"/>
     
     <TextView
         android:id="@+id/mv_play_desc"
@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:paddingBottom="10dp"
-        android:textColor="#fff"
-        android:textSize="14dp" />
+        android:textColor="#ffffff"
+		android:textAppearance="?android:attr/textAppearanceSmall"/>
 
     <TextView
         android:id="@+id/mv_found_display"
@@ -39,8 +39,8 @@
         android:gravity="center" 
         android:textColor="#fff"
         android:layout_marginTop="20dp"        
-        android:text="                      "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:text="                      "
+		android:textAppearance="?android:attr/textAppearanceSmall"/>
     
     <Button
         android:id="@+id/mv_btn_start_search"
@@ -51,7 +51,8 @@
         android:textColor="#fff"
         android:layout_marginTop="30dp"
         android:onClick="btn_start_searchClick"
-        android:text="@string/start_search" />
+        android:text="@string/start_search"
+		android:textAppearance="?android:attr/textAppearanceMedium"/>
     
     <TextView
         android:id="@+id/mv_progress_display"
@@ -60,8 +61,8 @@
         android:gravity="center" 
         android:textColor="#fff"
         android:layout_marginTop="20dp"        
-        android:text="                      "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+		android:text="                      "
+		android:textAppearance="?android:attr/textAppearanceSmall"/>
 	
 	<SeekBar
         android:id="@+id/mv_seekbar"
@@ -78,7 +79,8 @@
         android:textColor="#fff"
         android:layout_marginTop="30dp"
         android:onClick="btn_stopClick"
-        android:text="@string/stop" />
+        android:text="@string/stop" 
+		android:textAppearance="?android:attr/textAppearanceMedium"/>
     
 </LinearLayout>
 </RelativeLayout>
