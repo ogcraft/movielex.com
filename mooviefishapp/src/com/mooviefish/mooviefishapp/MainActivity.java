@@ -103,6 +103,7 @@ public class MainActivity extends Activity  implements
                 return true;
             case R.id.menu_about:
                 AboutDialog about = new AboutDialog(this);
+				about.gs = gs; 
                 about.setTitle("About this app");
                 about.show();
                 //about.getWindow().setLayout(300, 300);

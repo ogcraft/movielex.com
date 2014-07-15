@@ -62,7 +62,7 @@ import android.graphics.Point;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.3.7"; 
+	public static final String appVersion = "1.3.8"; 
 	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
