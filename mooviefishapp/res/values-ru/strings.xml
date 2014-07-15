@@ -13,7 +13,11 @@
     <string name="downloading">Загрузка...</string>
     <string name="play">Слушать</string>
 
-    <string name="ru_lang_name">Русский</string>
+	<string name="downloading_index">Загрузка индекса</string>
+	<string name="downloading_translation">Загрузка перевода</string>
+	<string name="downloading_movies_data">Загрузка данных</string>
+	
+	<string name="ru_lang_name">Русский</string>
 
     <string name="still_in_progress_wait">Все еще синхронизируем. Пожалуйста подождите...</string>
     <string name="wait_synchronizing">Идет синхронизация\nПожалуйста подождите...</string>

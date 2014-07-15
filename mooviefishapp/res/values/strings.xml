@@ -11,6 +11,9 @@
     <string name="download">Download</string>
     <string name="downloading">Downloading...</string>
     <string name="play">Play</string>
+	<string name="downloading_index">Downloading Index</string>
+	<string name="downloading_translation">Downloading Translation</string>
+	<string name="downloading_movies_data">Downloading Data</string>
 
     <string name="ru_lang_name">Russian</string>
 

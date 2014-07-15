@@ -70,7 +70,7 @@ public class MainActivity extends Activity  implements
         bar.setTitle(R.string.main_view_title);
         
         dialog = new ProgressDialog(MainActivity.this);
-        dialog.setMessage("Downloading movies...");
+        dialog.setTitle(R.string.downloading_movies_data);
         dialog.show();
         Toast.makeText(getApplicationContext(),
          String.format("%dx%d Path: %s", gs.height, gs.width, gs.getRootPath()), Toast.LENGTH_SHORT).show();

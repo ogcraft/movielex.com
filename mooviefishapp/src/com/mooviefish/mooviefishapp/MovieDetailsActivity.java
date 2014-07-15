@@ -102,8 +102,6 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         ActionBar bar = getActionBar();
         bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
-        
-        
         //mv_title_view = (TextView)findViewById(R.id.mv_detail_title);
         mv_details_img = (ImageView)findViewById(R.id.mv_details_img);
         mv_details_desc = (TextView)findViewById(R.id.mv_details_desc);
@@ -212,14 +210,14 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     public boolean isFpkesExist() {
         final String fn = gs.getFileNameForUrl(selectedMovie.fpkeys_file, selectedMovie.id);
         final File f = new File(fn);
-        return f.isFile();
+        return f.isFile() && f.length() > 100;
     }
     
     public boolean isTranslationExist(String lang) {
         final String url = selectedMovie.getTranslationFileName(lang);
         final String fn = gs.getFileNameForUrl(url, selectedMovie.id);
         File f = new File(fn);
-        return f.isFile();
+        return f.isFile() && f.length() > 100;
     }
 	
     public boolean load_fpkeys() {
@@ -234,7 +232,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         Log.d(TAG,"MovieDetailsActivity.load_fpkeys() fn: " + fn);
         
         File target = new File(fn);
-        if(!target.isFile()) {
+        if( !target.isFile() || target.length() < 10) {
 
             fpkey_download_dialog = new ProgressDialog(this);
 
@@ -243,7 +241,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
             fpkey_download_dialog.setCancelable(true);
             fpkey_download_dialog.setInverseBackgroundForced(false);
             fpkey_download_dialog.setCanceledOnTouchOutside(true);
-            fpkey_download_dialog.setTitle("Downloading Index");
+            fpkey_download_dialog.setTitle(R.string.downloading_index);
         
             gs.aq.progress(fpkey_download_dialog).download(selectedMovie.fpkeys_file, target, new AjaxCallback<File>(){
 
@@ -290,7 +288,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         Log.d(TAG,"MovieDetailsActivity.load_translation_for_lang() fn: " + fn);
         
         File target = new File(fn);
-        if(!target.isFile()) {
+        if( !target.isFile() || target.length() < 10) {
         
                 trans_download_dialog = new ProgressDialog(this);
 
@@ -299,7 +297,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                 trans_download_dialog.setCancelable(true);
                 trans_download_dialog.setInverseBackgroundForced(false);
                 trans_download_dialog.setCanceledOnTouchOutside(true);
-                trans_download_dialog.setTitle("Downloading Translation");
+                trans_download_dialog.setTitle(R.string.downloading_translation);
             
                 gs.aq.progress(trans_download_dialog).download(url, target, new AjaxCallback<File>(){
 
