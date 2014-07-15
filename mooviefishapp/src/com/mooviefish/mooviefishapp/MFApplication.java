@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.app.Application;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.FilenameFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -208,11 +209,34 @@ public class MFApplication extends Application
         return ret;
     }
 
+	public static String[] collectDirs( String dn) {
+		File file = new File(dn);
+		String[] directories = file.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File current, String name) {
+				return new File(current, name).isDirectory();
+			}
+		});
+		return directories;
+	}
+
+	public void cleanOldMovieData(ArrayList<String> movie_ids) {
+		ArrayList<String> directories = 
+			new ArrayList(
+			Arrays.asList(collectDirs(getRootPath()))); 
+		directories.removeAll(movie_ids);
+		for(String dn : directories){
+			File d = new File(getRootPath(),dn);	
+			Log.d(TAG,"removing dir: " + d.getPath());
+			deleteDirectory(d);
+		}
+	}
+
     public List<MovieItem> createMovieItemsFromJson(JSONArray jsonarray) {
         Log.d(TAG, "createMovieItemsFromJson downloaded movies: " + jsonarray.length());
 
         ArrayList<MovieItem> movies = new ArrayList<MovieItem>();
-
+		ArrayList<String> movie_ids = new ArrayList<String>();
         try {
             for(int i=0;i<jsonarray.length();i++)
             {
@@ -222,7 +246,6 @@ public class MFApplication extends Application
                 String title_year = String.format("%s (%s)",
                     c.getString("title"), year_released);
                 MovieItem mi = new MovieItem();
-
                 mi.id = c.getString("id");
                 mi.shortname = c.getString("shortname"); 
                 mi.title = title_year;
@@ -234,6 +257,7 @@ public class MFApplication extends Application
                 mi.src_url = c.getString("src-url");
                 mi.duration = c.getString("duration");
                 
+				movie_ids.add(mi.id);
                 String folder_name = root_path + mi.id;
                 MFApplication.createFolderForMovie(folder_name);
                 
@@ -261,6 +285,7 @@ public class MFApplication extends Application
                 movies.add(mi);
             }
             Log.d(TAG, "createMovieItemsFromJson() collected movies: " + movies.size());
+			cleanOldMovieData(movie_ids);
         } catch (JSONException e) {
             Log.d(TAG, "createMovieItemsFromJson(): Json parsing failed");
             // TODO Auto-generated catch block
@@ -305,7 +330,7 @@ public class MFApplication extends Application
         	json = convertStreamToString(fin);
 			//Make sure you close all streams.
 			fin.close();        
-			Log.d(TAG, "json: " + json);
+			//Log.d(TAG, "json: " + json);
 		} catch(Exception e) {
 			Log.d(TAG,"getJSONFromFile() Failed read json: " + fl.getPath());
 			return null;
