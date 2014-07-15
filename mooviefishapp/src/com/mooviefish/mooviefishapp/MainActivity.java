@@ -150,16 +150,17 @@ public class MainActivity extends Activity  implements
     public void getMovieListCallback(String url, File file, AjaxStatus status){
         Log.d(TAG, "getMovieListCallback called");
 		File json_file = null;
-        if(!(file != null && file.length() > 10)) {               
-        	json_file = new File(gs.getRootPath()+"movies.json");
-			Log.d(TAG,"getMovieListCallback() failed fetch JSON. Using stored ");
+        if(file != null && file.length() > 10) {               
+			json_file = file;
+        } else {
+        	json_file = new File(gs.getRootPath(),"movies.json");
             if(!(json_file != null && json_file.length() > 10)) {               
                 Log.d(TAG,"getMovieListCallback() failed exit");
                 return;
             }
-        }
-        json_file = file;
-        Log.d(TAG, "getMovieListCallback() Parsing file "+json_file.getPath()+" size: "+json_file.length());
+			//Log.d(TAG,"getMovieListCallback() failed fetch JSON. Using stored " + json_file.getPath());
+		}
+		Log.d(TAG, "getMovieListCallback() Parsing file "+json_file.getPath()+" size: "+json_file.length());
         
         final JSONArray _movies = gs.getJSONFromFile(json_file);
 

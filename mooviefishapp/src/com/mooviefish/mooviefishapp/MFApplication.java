@@ -62,6 +62,7 @@ import android.graphics.Point;
 public class MFApplication extends Application
 {
 	public static final String appVersion = "1.3.7"; 
+	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
@@ -170,18 +171,19 @@ public class MFApplication extends Application
         for ( int i = 0 ; i < children.length ; i ++ )
         {
             File child = new File( dn, children[i] );
-            deleteDirectory(child);
+            cleanDirectory(child);
         }
-        File json_file = new File(p + "movies.json" );
-		if(json_file != null) {
-			json_file.delete();
-		}
+        //File json_file = new File(p + "movies.json" );
+		//if(json_file != null) {
+		//	json_file.delete();
+		//}
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT);
+        Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT
+				+ " appVer: " + appVersion + " amatchVer: " + amatchVersion);
 
         if( Build.VERSION.SDK_INT >= 9){
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -588,6 +590,31 @@ public static void deleteDirectory( File dir )
         }
         dir.delete();
     }
+}
+
+public static void cleanDirectory( File dir )
+{
+	if ( dir.isDirectory() )
+	{
+		String [] children = dir.list();
+		for ( int i = 0 ; i < children.length ; i ++ )
+		{
+			File child =    new File( dir , children[i] );
+			if (child.isFile() && 
+					(child.getName().endsWith(".png") || 
+					 child.getName().endsWith(".jpg") )) {
+				continue;
+			}
+			if(child.isDirectory()){
+				deleteDirectory( child );
+				Log.d(TAG,"cleanDirectory()1 deleting: " + child.getName());
+				child.delete();
+			}else{
+				Log.d(TAG,"cleanDirectory()2 deleting: " + child.getName());
+				child.delete();
+			}
+		}
+	}
 }
 public static int getWidth(Context mContext){
     int width=0;

@@ -116,7 +116,7 @@ public class Amatch implements
                 if( i > 10 ) {
                     calculated_ms = (long)found_sec*1000 + recording_time_ms + 500; 
                 }
-                //i = 11; calculated_ms = 25795;
+                i = 11; calculated_ms = 25795;
                 if( i > 10 && 
                     (calculated_ms < translationMaxDuration_ms)) {
                     play_translation(translation_fn, (long) calculated_ms);

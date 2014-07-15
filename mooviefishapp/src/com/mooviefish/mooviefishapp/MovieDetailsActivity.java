@@ -81,7 +81,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 	private String      transLang = "";
     private int         movie_position = -1;
     private MovieItem   selectedMovie = null;
-	private TextView    mv_title_view;
+	//private TextView    mv_title_view;
     private ImageView   mv_details_img;
     private TextView    mv_details_desc;
 
@@ -104,7 +104,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         
         
         
-        mv_title_view = (TextView)findViewById(R.id.mv_detail_title);
+        //mv_title_view = (TextView)findViewById(R.id.mv_detail_title);
         mv_details_img = (ImageView)findViewById(R.id.mv_details_img);
         mv_details_desc = (TextView)findViewById(R.id.mv_details_desc);
         mv_details_trans_title1 = (TextView)findViewById(R.id.mv_details_trans_title1);
@@ -127,20 +127,19 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         //      android.R.layout.simple_list_item_1, android.R.id.text1, langs);
         //mv_list_view.setAdapter(adapter); 
         //mv_list_view.setOnItemClickListener(this);
+        bar.setTitle(R.string.details_view_title);
 		if(selectedMovie == null) {
-            mv_title_view.setText("   ");
-            bar.setTitle(R.string.details_view_title);
+            //mv_title_view.setText("   ");
         } else {
-            bar.setTitle(R.string.details_view_title);
-            //bar.setTitle(selectedMovie.title);
-            mv_title_view.setText(selectedMovie.title);
+            //mv_title_view.setText(selectedMovie.title);
             if(mv_details_desc != null && gs.isLargScreen()) {
                 //mv_details_desc.setText(
                 //    StringUtils.abbreviate(selectedMovie.desc, 
                 //    MFApplication.MAX_CHAR_ALLOWED_MOVIE_DETAILS_DESC_VIEW));
                 RelativeLayout.LayoutParams parms = 
                     new RelativeLayout.LayoutParams(gs.width,(int)(gs.height*0.6));
-                parms.addRule(RelativeLayout.BELOW, mv_title_view.getId());
+                //parms.addRule(RelativeLayout.BELOW, mv_title_view.getId());
+                parms.addRule(RelativeLayout.ALIGN_RIGHT);
                 mv_details_img.setLayoutParams(parms);
                 mv_details_img.setClickable(true);
                 mv_details_img.setOnClickListener(this); 

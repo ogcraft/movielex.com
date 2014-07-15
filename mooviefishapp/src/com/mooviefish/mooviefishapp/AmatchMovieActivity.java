@@ -80,7 +80,7 @@ public class AmatchMovieActivity extends Activity {
     private TextView    mv_sync_play_time_left;
     private TextView    mv_sync_play_time_right;
     private SeekBar     mv_seekbar;
-	private TextView    mv_title_view;
+	//private TextView    mv_title_view;
     //private TextView    mv_play_desc;
 
     private TextView    mv_found_display_view;
@@ -130,7 +130,7 @@ public class AmatchMovieActivity extends Activity {
         ActionBar bar = getActionBar();
         bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
-        mv_title_view = (TextView)findViewById(R.id.mv_sync_title);
+        //mv_title_view = (TextView)findViewById(R.id.mv_sync_title);
         mv_sync_img = (ImageView)findViewById(R.id.mv_sync_img);
         //mv_play_desc = (TextView)findViewById(R.id.mv_play_desc);
         //mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
@@ -155,18 +155,18 @@ public class AmatchMovieActivity extends Activity {
             selectedMovie = gs.movieItems.get(movie_position);
         }
         
+		bar.setTitle(R.string.play_view_title);
         if(selectedMovie == null) {
-            mv_title_view.setText("   ");
-            bar.setTitle(R.string.play_view_title);
+            //mv_title_view.setText("   ");
         } else {
-            bar.setTitle(R.string.play_view_title);
             //bar.setTitle(selectedMovie.title);
-            mv_title_view.setText(selectedMovie.title);
+            //mv_title_view.setText(selectedMovie.title);
             if(gs.isLargScreen()) {
                 mv_sync_img.setImageURI(selectedMovie.getImgUri());
             } else {
                 RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(50,50);
                 mv_sync_img.setLayoutParams(parms);
+                mv_sync_img.setImageURI(selectedMovie.getImgUri());
             }
             //mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
             if(load_fpkeys() && load_translation_for_lang("ru")) {
@@ -187,7 +187,8 @@ public class AmatchMovieActivity extends Activity {
     }
     
 	public boolean load_translation_for_lang(String lang) {
-		String fn = selectedMovie.getTranslationFileName(lang);
+		String url = selectedMovie.getTranslationFileName(lang);
+		String fn = gs.getFileNameForUrl(url, selectedMovie.id);
         Log.d(TAG, "AmatchMovieActivity: translation fn: " + fn);
 		gs.amatch.createMediaPlayerForTranslation(fn);
 		return true;
