@@ -4,68 +4,58 @@
     android:layout_height="wrap_content"
     android:paddingRight="10dp"
     android:paddingLeft="10dp"
-    android:id="@+id/layout0" >
-    
-    <ImageView
-        android:id="@+id/mv_details_img"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:contentDescription="@string/image"
-        
-        android:paddingTop="20dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" />
+    android:id="@+id/mv_details_layout0" >
 
     <TextView
-        android:id="@+id/mv_title"
+        android:id="@+id/mv_detail_title"
         android:layout_height="wrap_content" 
-        android:layout_width="wrap_content" 
-        android:textColor="#ffffff"
-        android:layout_toRightOf="@+id/mv_details_img"
-		android:paddingBottom="10dp"
-		android:textAppearance="?android:attr/textAppearanceLarge"/>
-    
+        android:layout_width="fill_parent" 
+        android:gravity="center" 
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        android:text="                "
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentTop="true"/>
+   
+    <ImageView
+        android:id="@+id/mv_details_img"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:paddingTop="20dp"
+        android:layout_centerHorizontal="true" 
+        android:layout_below="@id/mv_detail_title"
+        />
+  
     <TextView
         android:id="@+id/mv_details_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/mv_details_img"
         android:paddingBottom="10dp"
-		android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textColor="#ABABAB"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+    />
+
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/layout1"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mv_details_desc"
-        android:orientation="vertical"
-        android:layout_centerVertical="true" >
-
-        <ProgressBar
-        android:id="@+id/mv_details_trans_progress1"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/mv_details_desc" 
-        style="?android:attr/progressBarStyleHorizontal" 
-        android:layout_margin="10dp" />
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/layout1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/mv_details_trans_progress1"
-        android:orientation="horizontal"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:layout_centerHorizontal="true" >
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+         >
 
         <ImageView
             android:id="@+id/mv_details_flag_img1"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/flag_ru" />
+            android:src="@drawable/flag_ru"
+            android:layout_below="@id/mv_details_desc" />
          
         <TextView
             android:id="@+id/mv_details_trans_title1"
@@ -75,6 +65,7 @@
             android:paddingRight="10dp"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:textColor="#ffffff"/>
+
         <Button
             android:id="@+id/mv_details_trans_get1"
             android:layout_height="wrap_content" 
@@ -84,7 +75,5 @@
             android:background="@drawable/btn_background"
 			android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ffffff" />
-        </LinearLayout>
     </LinearLayout>
-   
 </RelativeLayout>

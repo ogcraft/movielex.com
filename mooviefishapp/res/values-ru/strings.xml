@@ -29,11 +29,10 @@
 	<string name="settings_set_presentation_lang">Изменить язык представления данных</string>
 	<string name="settings_set_data_path">Изменить место сохранения данных</string>
 	
-	<string name="main_view_title">Фильмы</string>
-<!--	
-	<string name="details_view_title">Фильмы</string>
-	<string name="play_view_title">Фильмы</string>
--->
+	<string name="main_view_title">Сейчас в кино</string>	
+	<string name="details_view_title">Афиша</string>
+	<string name="play_view_title">Просмотр</string>
+
 	<string name="menu_settings">Настройки</string>
 	<string name="menu_clear_cache">Удалить сохраненные данные</string>
 	<string name="menu_about">О программе</string>

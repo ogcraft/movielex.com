@@ -59,7 +59,10 @@ public class MainActivity extends Activity  implements
     	
     	gs = (MFApplication) getApplication();
     	TAG = gs.getTAG();
-    	//Log.d(TAG,"MainActivity.onCreate");
+        gs.width = MFApplication.getWidth(getApplicationContext());
+        gs.height = MFApplication.getHeight(getApplicationContext());
+        Log.d(TAG, "MainActivity.onCreate h: " + gs.height + " w: " + gs.width);
+        //Log.d(TAG,"MainActivity.onCreate");
         setContentView(R.layout.main);
         Log.d(TAG, "MainActivity.onCreate(): root_path: " + gs.getRootPath());
         ActionBar bar = getActionBar();
@@ -69,7 +72,8 @@ public class MainActivity extends Activity  implements
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Downloading movies...");
         dialog.show();
-        Toast.makeText(getApplicationContext(), "Path: " + gs.getRootPath(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),
+         String.format("%dx%d Path: %s", gs.height, gs.width, gs.getRootPath()), Toast.LENGTH_SHORT).show();
 
         getMovieItems(); 
         
@@ -138,7 +142,7 @@ public class MainActivity extends Activity  implements
         AjaxCallback<File> cb = new AjaxCallback<File>();        
         cb.url(serviceUrl).type(File.class).weakHandler(this, "getMovieListCallback").targetFile(target);
         cb.header("Content-Type", "application/json");  
-        int DOWNLOAD_TO_MS = 10*1000; //in ms  
+        int DOWNLOAD_TO_MS = 30*1000; //in ms  
 		cb.setTimeout(DOWNLOAD_TO_MS);
         gs.aq.ajax(cb);
     }
@@ -149,14 +153,17 @@ public class MainActivity extends Activity  implements
         if(!(file != null && file.length() > 10)) {               
         	json_file = new File(gs.getRootPath()+"movies.json");
 			Log.d(TAG,"getMovieListCallback() failed fetch JSON. Using stored ");
+            if(!(json_file != null && json_file.length() > 10)) {               
+                Log.d(TAG,"getMovieListCallback() failed exit");
+                return;
+            }
         }
+        json_file = file;
+        Log.d(TAG, "getMovieListCallback() Parsing file "+json_file.getPath()+" size: "+json_file.length());
         
-        if(!(json_file != null && json_file.length() > 10)) {               
-			Log.d(TAG,"getMovieListCallback() failed exit");
-			return;
-        }
-		final JSONArray _movies = gs.getJSONFromFile(json_file);
-		if(_movies != null) {
+        final JSONArray _movies = gs.getJSONFromFile(json_file);
+
+        if(_movies != null) {
 			Log.d(TAG, "getMovieListCallback(): Got movies: " + _movies.length());
 			Thread thread = new Thread() {
 				@Override
@@ -173,7 +180,9 @@ public class MainActivity extends Activity  implements
 				}
 			};
 			thread.start();
-		}
+		} else {
+            Log.d(TAG,"getMovieListCallback() _movies == null");
+        }
     }
 
     public void getMovieItems() {

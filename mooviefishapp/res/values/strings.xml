@@ -24,11 +24,10 @@
 
 	<string name="settings_set_presentation_lang">Change Presentation Language</string>
 	<string name="settings_set_data_path">Change Data Path</string>
-	<string name="main_view_title">Movies</string>
-<!--	
-	<string name="details_view_title">Movies</string>
-	<string name="play_view_title">Movies</string>
--->
+	<string name="main_view_title">Now Showing</string>
+	<string name="details_view_title">Poster</string>
+	<string name="play_view_title">Showing</string>
+
 	<string name="menu_settings">Settings</string>
 	<string name="menu_clear_cache">Clear Saved Data</string>
 	<string name="menu_about">About</string>

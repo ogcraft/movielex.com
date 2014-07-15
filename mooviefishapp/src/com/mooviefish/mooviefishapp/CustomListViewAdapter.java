@@ -48,9 +48,11 @@ public class CustomListViewAdapter extends ArrayAdapter<MovieItem> {
             holder = (ViewHolder) convertView.getTag();
         }
  
-        holder.txtDesc.setText(StringUtils.abbreviate(movieItem.desc, 100));
+        holder.txtDesc.setText(
+            StringUtils.abbreviate(
+                movieItem.desc_short, 
+                MFApplication.MAX_CHAR_ALLOWED_MOVIE_LIST_DESC_VIEW));
         holder.txtTitle.setText(movieItem.title);
-        //Log.d(TAG,"img uri: " +)
         holder.imageView.setImageURI(movieItem.getImgUri());
  
         return convertView;

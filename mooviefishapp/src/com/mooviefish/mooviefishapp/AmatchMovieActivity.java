@@ -41,6 +41,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.AdapterView;
@@ -128,7 +130,7 @@ public class AmatchMovieActivity extends Activity {
         ActionBar bar = getActionBar();
         bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
-        mv_title_view = (TextView)findViewById(R.id.mv_title);
+        mv_title_view = (TextView)findViewById(R.id.mv_sync_title);
         mv_sync_img = (ImageView)findViewById(R.id.mv_sync_img);
         //mv_play_desc = (TextView)findViewById(R.id.mv_play_desc);
         //mv_progress_display_view = (TextView)findViewById(R.id.mv_progress_display);
@@ -155,12 +157,17 @@ public class AmatchMovieActivity extends Activity {
         
         if(selectedMovie == null) {
             mv_title_view.setText("   ");
-            bar.setTitle(R.string.main_view_title);
+            bar.setTitle(R.string.play_view_title);
         } else {
-            bar.setTitle(R.string.main_view_title);
+            bar.setTitle(R.string.play_view_title);
             //bar.setTitle(selectedMovie.title);
             mv_title_view.setText(selectedMovie.title);
-            mv_sync_img.setImageURI(selectedMovie.getImgUri());
+            if(gs.isLargScreen()) {
+                mv_sync_img.setImageURI(selectedMovie.getImgUri());
+            } else {
+                RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(50,50);
+                mv_sync_img.setLayoutParams(parms);
+            }
             //mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
             if(load_fpkeys() && load_translation_for_lang("ru")) {
                 mv_found_display_view.setText("");

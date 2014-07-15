@@ -41,6 +41,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.AdapterView;
@@ -67,6 +69,8 @@ import java.util.List;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import org.apache.commons.lang3.StringUtils;
+import android.net.Uri;
 
 public class MovieDetailsActivity extends Activity implements OnClickListener {
     public static final String MOVIE_POSITION = "MOVIE_POSITION";
@@ -84,7 +88,6 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     private TextView    mv_details_trans_title1;
     private Button      mv_details_trans_get1;
     private TransState  trans_state1 = TransState.UNKNOWN;
-    private ProgressBar mv_details_trans_progress1;
     private ProgressDialog fpkey_download_dialog = null;
     private ProgressDialog trans_download_dialog = null;
        
@@ -100,16 +103,15 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
         
+        
+        mv_title_view = (TextView)findViewById(R.id.mv_detail_title);
         mv_details_img = (ImageView)findViewById(R.id.mv_details_img);
-        mv_title_view = (TextView)findViewById(R.id.mv_title);
         mv_details_desc = (TextView)findViewById(R.id.mv_details_desc);
         mv_details_trans_title1 = (TextView)findViewById(R.id.mv_details_trans_title1);
         mv_details_trans_title1.setText(R.string.ru_lang_name);
         mv_details_trans_get1 = (Button)findViewById(R.id.mv_details_trans_get1);
         mv_details_trans_get1.setText(R.string.download);
         mv_details_trans_get1.setOnClickListener(this);
-        mv_details_trans_progress1 = (ProgressBar) findViewById(R.id.mv_details_trans_progress1);
-        mv_details_trans_progress1.setVisibility(View.INVISIBLE);
 
         
         movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
@@ -127,17 +129,29 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         //mv_list_view.setOnItemClickListener(this);
 		if(selectedMovie == null) {
             mv_title_view.setText("   ");
-            bar.setTitle(R.string.main_view_title);
+            bar.setTitle(R.string.details_view_title);
         } else {
-            bar.setTitle(R.string.main_view_title);
+            bar.setTitle(R.string.details_view_title);
             //bar.setTitle(selectedMovie.title);
             mv_title_view.setText(selectedMovie.title);
-            mv_details_img.setImageURI(selectedMovie.getImgUri());
-            mv_details_desc.setText(selectedMovie.desc);
+            if(mv_details_desc != null && gs.isLargScreen()) {
+                //mv_details_desc.setText(
+                //    StringUtils.abbreviate(selectedMovie.desc, 
+                //    MFApplication.MAX_CHAR_ALLOWED_MOVIE_DETAILS_DESC_VIEW));
+                RelativeLayout.LayoutParams parms = 
+                    new RelativeLayout.LayoutParams(gs.width,(int)(gs.height*0.6));
+                parms.addRule(RelativeLayout.BELOW, mv_title_view.getId());
+                mv_details_img.setLayoutParams(parms);
+                mv_details_img.setClickable(true);
+                mv_details_img.setOnClickListener(this); 
+            }
+
             if( isFpkesExist() && isTranslationExist(transLang)) {
                 trans_state1 = TransState.DOWNLOADED;
                 mv_details_trans_get1.setText(R.string.play); 
             }
+
+            mv_details_img.setImageURI(selectedMovie.getImgUri());
         }
 	}
 
@@ -151,6 +165,18 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         switch (id) {
             case R.id.mv_details_trans_get1:
             mv_details_trans_get1_onClick(v);
+            break;
+            case R.id.mv_details_img:
+            //Toast.makeText(getApplicationContext(),
+            //    "The movie details would appear on clicking this icon",
+            //    Toast.LENGTH_LONG).show();
+
+            if(selectedMovie != null) {
+                Log.d(TAG, "MovieDetailsActivity open " + selectedMovie.src_url);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, 
+                    Uri.parse(selectedMovie.src_url));
+                startActivity(browserIntent);
+            }
             break;
         }
     }
@@ -210,7 +236,6 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         
         File target = new File(fn);
         if(!target.isFile()) {
-            mv_details_trans_progress1.setVisibility(View.INVISIBLE);
 
             fpkey_download_dialog = new ProgressDialog(this);
 
@@ -267,9 +292,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         
         File target = new File(fn);
         if(!target.isFile()) {
-            mv_details_trans_progress1.setVisibility(View.INVISIBLE);
         
-
                 trans_download_dialog = new ProgressDialog(this);
 
                 //trans_download_dialog.setIndeterminate(true);
@@ -279,8 +302,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                 trans_download_dialog.setCanceledOnTouchOutside(true);
                 trans_download_dialog.setTitle("Downloading Translation");
             
-            //gs.aq.progress(R.id.mv_details_trans_progress1).download(url, target, new AjaxCallback<File>(){
-            gs.aq.progress(trans_download_dialog).download(url, target, new AjaxCallback<File>(){
+                gs.aq.progress(trans_download_dialog).download(url, target, new AjaxCallback<File>(){
 
                 public void callback(String url, File file, AjaxStatus status) {
 

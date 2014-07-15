@@ -10,21 +10,31 @@ public class MovieItem {
     public String id;
     public String shortname;
     public String title;
+    public String year_released;
     public String desc;
+    public String desc_short;
     public String img;
     public String fpkeys_file;
+    public String src_url;
+    public String duration;
     public List<MovieTranslations> translations;
 
-    public MovieItem(String id, String shortname, String title, String desc, String img, String fpkeys_file) {
+    public MovieItem() {
+        this.translations = new ArrayList<MovieTranslations>();
+    }
+/*
+    public MovieItem(String id, String shortname, String title, String year_released, String desc, String desc_short, String img, String fpkeys_file) {
         this.id = id;
         this.shortname = shortname;
         this.title = title;
+        this.year_released = year_released;
         this.desc = desc;
+        this.desc_short = desc_short;
         this.img = img;
         this.fpkeys_file = fpkeys_file;
         this.translations = new ArrayList<MovieTranslations>();
     }
-    
+*/    
     @Override
     public String toString() {
         return id + "|" + title;

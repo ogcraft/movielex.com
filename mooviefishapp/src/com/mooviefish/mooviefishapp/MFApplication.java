@@ -40,6 +40,9 @@ import com.androidquery.callback.AjaxStatus;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.content.Context;
+import android.view.WindowManager;
+import android.view.Display;
+import android.graphics.Point;
 
 /**
 * This is a global state for MoovieFishApp
@@ -58,16 +61,19 @@ import android.content.Context;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.3.5"; 
+	public static final String appVersion = "1.3.7"; 
 	private static final String TAG = "MoovieFishApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MoovieFish/";
 	public static Amatch amatch = null;
     private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
     static int CONNECTION_TIMEOUT = 0; //msec
     static int DATARETRIEVAL_TIMEOUT = 0; //msec
+    static final int MAX_CHAR_ALLOWED_MOVIE_DETAILS_DESC_VIEW = 600;
+    static final int MAX_CHAR_ALLOWED_MOVIE_LIST_DESC_VIEW = 150;
     static String moovifishSite = "http://mooviefish.com";
     //static String moovifishSite = "http://192.168.10.109:3000";
-    
+    public int height = 0;
+    public int width = 0;
     static final String BASE_URL = "http://mooviefish.com";
     static final String RESOURCE_PREFIX = BASE_URL + "/files/";
 
@@ -82,7 +88,9 @@ public class MFApplication extends Application
     public String getTAG() {
       return TAG;
     }
-
+    public boolean isLargScreen() {
+        return (height > 800);
+    }
     public String getRootPath() {
         return root_path;
     }
@@ -208,13 +216,21 @@ public class MFApplication extends Application
             {
                 JSONObject c=jsonarray.getJSONObject(i);// Used JSON Object from Android
                 //Log.d(TAG, "JSON: " + c.toString());
-                MovieItem mi = new MovieItem(
-                    c.getString("id"), 
-                    c.getString("shortname"), 
-                    c.getString("title"), 
-                    c.getString("desc"), 
-                    c.getString("img"), 
-                    c.getString("fpkeys-file"));
+                String year_released = c.getString("year-released");
+                String title_year = String.format("%s (%s)",
+                    c.getString("title"), year_released);
+                MovieItem mi = new MovieItem();
+
+                mi.id = c.getString("id");
+                mi.shortname = c.getString("shortname"); 
+                mi.title = title_year;
+                mi.year_released = year_released; 
+                mi.desc = c.getString("desc");
+                mi.desc_short = c.getString("desc-short"); 
+                mi.img = c.getString("img"); 
+                mi.fpkeys_file = c.getString("fpkeys-file");
+                mi.src_url = c.getString("src-url");
+                mi.duration = c.getString("duration");
                 
                 String folder_name = root_path + mi.id;
                 MFApplication.createFolderForMovie(folder_name);
@@ -573,5 +589,33 @@ public static void deleteDirectory( File dir )
         dir.delete();
     }
 }
+public static int getWidth(Context mContext){
+    int width=0;
+    WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+    Display display = wm.getDefaultDisplay();
+    if(Build.VERSION.SDK_INT>12){
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+    }
+    else{
+        width = display.getWidth();  // Deprecated
+    }
+    return width;
+}
 
+public static int getHeight(Context mContext){
+    int height=0;
+    WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+    Display display = wm.getDefaultDisplay();
+    if(Build.VERSION.SDK_INT>12){
+        Point size = new Point();
+        display.getSize(size);
+        height = size.y;
+    }
+    else{
+        height = display.getHeight();  // Deprecated
+    }
+    return height;
+}
 } // end of MVApplication
