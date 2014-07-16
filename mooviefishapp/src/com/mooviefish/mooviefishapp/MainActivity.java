@@ -101,6 +101,10 @@ public class MainActivity extends Activity  implements
             case R.id.menu_clear_cache:
                 gs.cleanDownloadedData();
                 return true;
+            case R.id.menu_refresh_movie_data:
+                gs.refreshMovieData();
+                getMovieItems();
+                return true;
             case R.id.menu_about:
                 AboutDialog about = new AboutDialog(this);
 				about.gs = gs; 
@@ -145,16 +149,21 @@ public class MainActivity extends Activity  implements
         cb.header("Content-Type", "application/json");  
         int DOWNLOAD_TO_MS = 30*1000; //in ms  
 		cb.setTimeout(DOWNLOAD_TO_MS);
+        if(gs.expireMovieDataCache) {
+            cb.expire(-1);
+        }
         gs.aq.ajax(cb);
     }
 
     public void getMovieListCallback(String url, File file, AjaxStatus status){
         Log.d(TAG, "getMovieListCallback called");
 		File json_file = null;
-        if(file != null && file.length() > 10) {               
+        if(file != null && file.length() > 10) { 
+            Log.d(TAG, "getMovieListCallback() using downloaded file: " + file.getPath());    
 			json_file = file;
         } else {
         	json_file = new File(gs.getRootPath(),"movies.json");
+            Log.d(TAG, "getMovieListCallback() using srored file: " + json_file.getPath());   
             if(!(json_file != null && json_file.length() > 10)) {               
                 Log.d(TAG,"getMovieListCallback() failed exit");
                 return;

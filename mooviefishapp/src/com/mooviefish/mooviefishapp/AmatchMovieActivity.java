@@ -169,13 +169,17 @@ public class AmatchMovieActivity extends Activity {
                 mv_sync_img.setImageURI(selectedMovie.getImgUri());
             }
             //mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
-            if(load_fpkeys() && load_translation_for_lang("ru")) {
+
+            if(gs.amatch.isMediaPlayerPlaying) {
+                Log.d(TAG,"AmatchMovieActivity.onCreate() already Playing do nothing");
+                mv_btn_start_search.setEnabled(false);
+            } else if(load_fpkeys() && load_translation_for_lang("ru")) {
                 mv_found_display_view.setText("");
                 mv_btn_start_search.setEnabled(true);
             } else {
+                Log.d(TAG,"AmatchMovieActivity.onCreate() is Not Playing and failed to load trans and fpke files");
                 //Toast.makeText(getApplicationContext(),
                 //    "Error: \"" + selectedMovie.id + "\" not found", Toast.LENGTH_LONG).show();
-                Log.d(TAG, "Error: \"" + selectedMovie.id + "\" not found");
             }
         }
 		mv_found_display_view.setText("  \n  ");

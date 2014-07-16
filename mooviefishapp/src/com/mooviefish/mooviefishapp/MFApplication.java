@@ -76,6 +76,7 @@ public class MFApplication extends Application
     //static String moovifishSite = "http://192.168.10.109:3000";
     public int height = 0;
     public int width = 0;
+    public boolean expireMovieDataCache = false;
     static final String BASE_URL = "http://mooviefish.com";
     static final String RESOURCE_PREFIX = BASE_URL + "/files/";
 
@@ -174,10 +175,18 @@ public class MFApplication extends Application
             File child = new File( dn, children[i] );
             cleanDirectory(child);
         }
-        //File json_file = new File(p + "movies.json" );
-		//if(json_file != null) {
-		//	json_file.delete();
-		//}
+        
+    }
+
+    public void refreshMovieData() {
+        String p = getRootPath() + "movies.json";
+        Log.d(TAG, "MFApplication.refreshMovieData(): removing " + p);
+        File json_file = new File(p);
+        if(json_file != null) {
+          json_file.delete();
+        }
+        expireMovieDataCache = true;
+
     }
 
     @Override
@@ -291,6 +300,7 @@ public class MFApplication extends Application
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        expireMovieDataCache = false;
         return movies;
     }
 
@@ -310,6 +320,10 @@ public class MFApplication extends Application
             AjaxCallback<File> cb = new AjaxCallback<File>();
 
             cb.url(url).type(File.class).targetFile(target);
+            
+            if(expireMovieDataCache) {
+                cb.expire(-1);
+            }
 
             aq.sync(cb);
         //File f = cb.getResult();

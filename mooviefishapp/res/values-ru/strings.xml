@@ -38,6 +38,7 @@
 	<string name="settings_set_data_path">Изменить место сохранения данных</string>
 	
 	<string name="menu_settings">Настройки</string>
+	<string name="menu_refresh_movie_data">Обновить данные</string>
 	<string name="menu_clear_cache">Удалить сохраненные данные</string>
 	<string name="menu_about">О программе</string>
 	<string name="menu_exit">Выход</string>
