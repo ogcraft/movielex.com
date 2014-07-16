@@ -14,7 +14,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder; 
 import java.nio.FloatBuffer; 
 import java.util.concurrent.TimeUnit;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
 import com.lamerman.FileDialog;
 import com.lamerman.SelectionMode;
 import android.app.Activity;
@@ -189,7 +191,8 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         Log.d(TAG,"MovieDetailsActivity.mv_details_trans_get1_onClick():");
         switch(trans_state1) {
             case UNKNOWN:
-                load_fpkeys();
+    			acquirePermissionForMovie("11");
+				//load_fpkeys();
                 break;
             case DOWNLOADED:
                 if( isFpkesExist() && isTranslationExist(transLang)) { 
@@ -219,7 +222,45 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         File f = new File(fn);
         return f.isFile() && f.length() > 100;
     }
-	
+
+    public boolean acquirePermissionForMovie(String did) {
+		if(selectedMovie == null) {
+            Log.d(TAG,"MovieDetailsActivity.acquirePermissionForMovie() Fails: selectedMovie is null");
+			return false;
+		}
+        String url = String.format(
+				gs.GETACQUIRE_PERMISSION_REST, gs.BASE_URL, did, selectedMovie.id);
+        Log.d(TAG, "acquirePermissionForMovie(): url: " + url);
+
+		gs.aq.ajax(url, JSONObject.class, new AjaxCallback<JSONObject>() {
+			@Override
+			public void callback(String url, JSONObject json, AjaxStatus status) {
+				if(json != null){
+					Log.d(TAG,"MovieDetailsActivity.acquirePermissionForMovie() got result: " + json);	
+					boolean permission = false; 
+					try {
+						permission = json.getBoolean("permission");
+					} catch (JSONException e) {
+						Log.d(TAG, "acquirePermissionForMovie(): Json parsing failed");
+						e.printStackTrace();
+					}
+					if(permission) {
+						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission true");
+						load_fpkeys();
+					} else {
+						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission false");
+            			Toast.makeText(getApplicationContext(),
+            			"You have no permission to play this movie",
+            			Toast.LENGTH_LONG).show();
+					}
+				}else{
+					Log.d(TAG,"MovieDetailsActivity.acquirePermissionForMovie() failed");	
+				}
+			}
+		});
+		return false;
+	}
+
     public boolean load_fpkeys() {
 		if(selectedMovie == null) {
             Log.d(TAG,"MovieDetailsActivity.load_fpkeys() Fails: selectedMovie is null");
@@ -332,5 +373,4 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         return true;
     }
 
-   
 }

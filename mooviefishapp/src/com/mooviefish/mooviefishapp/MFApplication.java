@@ -81,8 +81,9 @@ public class MFApplication extends Application
     static final String RESOURCE_PREFIX = BASE_URL + "/files/";
 
     static final String GETMOVIES_REST = "%s/api/movies/%s";
-    static final String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%d";
-
+    static final String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%s";
+	//http://www.mooviefish.com/api/acquire/11/1001
+    static final String GETACQUIRE_PERMISSION_REST = "%s/api/acquire/%s/%s";
     public AQuery aq = new AQuery(this);
     public SharedPreferences sharedPrefs;
 
