@@ -189,25 +189,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 
     public void mv_details_trans_get1_onClick(View v) {
         Log.d(TAG,"MovieDetailsActivity.mv_details_trans_get1_onClick():");
-        switch(trans_state1) {
-            case UNKNOWN:
-    			acquirePermissionForMovie("11");
-				//load_fpkeys();
-                break;
-            case DOWNLOADED:
-                if( isFpkesExist() && isTranslationExist(transLang)) { 
-                    Log.d(TAG,"MainActivity.onItemClick() start AmatchMovieActivity");
-                    Intent movieActivity = new Intent(getApplicationContext(), AmatchMovieActivity.class);
-                    movieActivity.putExtra(AmatchMovieActivity.MOVIE_POSITION, movie_position);
-                    startActivity(movieActivity);
-                } else {
-                    trans_state1 = TransState.UNKNOWN;
-                    mv_details_trans_get1.setText(R.string.download); 
-                }
-                break;
-            case DOWNLOADING:
-                break;
-        }
+    	acquirePermissionForMovie("11");
     }
 
     public boolean isFpkesExist() {
@@ -246,7 +228,24 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 					}
 					if(permission) {
 						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission true");
-						load_fpkeys();
+						switch(trans_state1) {
+							case UNKNOWN:
+								load_fpkeys();
+								break;
+							case DOWNLOADED:
+								if( isFpkesExist() && isTranslationExist(transLang)) { 
+									Log.d(TAG,"MainActivity.onItemClick() start AmatchMovieActivity");
+									Intent movieActivity = new Intent(getApplicationContext(), AmatchMovieActivity.class);
+									movieActivity.putExtra(AmatchMovieActivity.MOVIE_POSITION, movie_position);
+									startActivity(movieActivity);
+								} else {
+									trans_state1 = TransState.UNKNOWN;
+									mv_details_trans_get1.setText(R.string.download); 
+								}
+								break;
+							case DOWNLOADING:
+								break;
+						}
 					} else {
 						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission false");
             			Toast.makeText(getApplicationContext(),
