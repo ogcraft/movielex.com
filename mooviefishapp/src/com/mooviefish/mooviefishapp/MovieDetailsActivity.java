@@ -128,29 +128,27 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         //mv_list_view.setAdapter(adapter); 
         //mv_list_view.setOnItemClickListener(this);
         bar.setTitle(R.string.details_view_title);
-		if(selectedMovie == null) {
-            //mv_title_view.setText("   ");
-        } else {
+		if(selectedMovie != null) {
             //mv_title_view.setText(selectedMovie.title);
-            if(mv_details_desc != null && gs.isLargScreen()) {
+            //if(mv_details_desc != null /*&& gs.isLargScreen()*/) {
                 //mv_details_desc.setText(
                 //    StringUtils.abbreviate(selectedMovie.desc, 
                 //    MFApplication.MAX_CHAR_ALLOWED_MOVIE_DETAILS_DESC_VIEW));
-                RelativeLayout.LayoutParams parms = 
+                 
+            //}
+            RelativeLayout.LayoutParams parms = 
                     new RelativeLayout.LayoutParams(gs.width,(int)(gs.height*0.6));
                 //parms.addRule(RelativeLayout.BELOW, mv_title_view.getId());
-                parms.addRule(RelativeLayout.ALIGN_RIGHT);
-                mv_details_img.setLayoutParams(parms);
-                mv_details_img.setClickable(true);
-                mv_details_img.setOnClickListener(this); 
-            }
+            parms.addRule(RelativeLayout.ALIGN_RIGHT);
+            mv_details_img.setLayoutParams(parms);
+            mv_details_img.setClickable(true);
+            mv_details_img.setOnClickListener(this);
+            mv_details_img.setImageURI(selectedMovie.getImgUri());
 
             if( isFpkesExist() && isTranslationExist(transLang)) {
                 trans_state1 = TransState.DOWNLOADED;
                 mv_details_trans_get1.setText(R.string.play); 
             }
-
-            mv_details_img.setImageURI(selectedMovie.getImgUri());
         }
 	}
 
@@ -189,7 +187,8 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 
     public void mv_details_trans_get1_onClick(View v) {
         Log.d(TAG,"MovieDetailsActivity.mv_details_trans_get1_onClick():");
-    	acquirePermissionForMovie("11");
+    	//acquirePermissionForMovie("11");
+        do_switch_on_tarns_state();
     }
 
     public boolean isFpkesExist() {
@@ -203,6 +202,30 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         final String fn = gs.getFileNameForUrl(url, selectedMovie.id);
         File f = new File(fn);
         return f.isFile() && f.length() > 100;
+    }
+
+    private void do_switch_on_tarns_state() {
+        switch(trans_state1) {
+            case UNKNOWN:
+            load_fpkeys();
+            break;
+            case DOWNLOADED:
+            if( isFpkesExist() && isTranslationExist(transLang)) { 
+                Log.d(TAG,"MainActivity start AmatchMovieActivity");
+                Intent movieActivity = new Intent(getApplicationContext(), AmatchMovieActivity.class);
+                movieActivity.putExtra(AmatchMovieActivity.MOVIE_POSITION, movie_position);
+                startActivity(movieActivity);
+            } else {
+                trans_state1 = TransState.UNKNOWN;
+                mv_details_trans_get1.setText(R.string.download); 
+            }
+            break;
+            case DOWNLOADING:
+            break;
+        }
+
+        
+
     }
 
     public boolean acquirePermissionForMovie(String did) {
@@ -228,24 +251,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 					}
 					if(permission) {
 						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission true");
-						switch(trans_state1) {
-							case UNKNOWN:
-								load_fpkeys();
-								break;
-							case DOWNLOADED:
-								if( isFpkesExist() && isTranslationExist(transLang)) { 
-									Log.d(TAG,"MainActivity.onItemClick() start AmatchMovieActivity");
-									Intent movieActivity = new Intent(getApplicationContext(), AmatchMovieActivity.class);
-									movieActivity.putExtra(AmatchMovieActivity.MOVIE_POSITION, movie_position);
-									startActivity(movieActivity);
-								} else {
-									trans_state1 = TransState.UNKNOWN;
-									mv_details_trans_get1.setText(R.string.download); 
-								}
-								break;
-							case DOWNLOADING:
-								break;
-						}
+						do_switch_on_tarns_state();
 					} else {
 						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission false");
             			Toast.makeText(getApplicationContext(),

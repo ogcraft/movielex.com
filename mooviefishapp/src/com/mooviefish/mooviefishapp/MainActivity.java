@@ -72,8 +72,8 @@ public class MainActivity extends Activity  implements
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setTitle(R.string.downloading_movies_data);
         dialog.show();
-        Toast.makeText(getApplicationContext(),
-         String.format("%dx%d Path: %s", gs.height, gs.width, gs.getRootPath()), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),
+        // String.format("%dx%d Path: %s", gs.height, gs.width, gs.getRootPath()), Toast.LENGTH_SHORT).show();
 
         getMovieItems(); 
         

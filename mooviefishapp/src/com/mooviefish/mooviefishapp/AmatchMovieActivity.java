@@ -74,6 +74,8 @@ public class AmatchMovieActivity extends Activity {
 	private String track_keys_fn = null;
 	private String translation_fn = null;
     private int movie_position = -1;
+    private final int MAX_SYNC_TRIES = 3;
+    private int match_tries = MAX_SYNC_TRIES;
     private MovieItem selectedMovie = null;
     private ImageView   mv_sync_img;
     //private TextView    mv_progress_display_view;
@@ -94,14 +96,27 @@ public class AmatchMovieActivity extends Activity {
             long search_duration_ms = bundle.getLong("search_duration_ms");
             if(mv_found_display_view != null) {
                 String s = null;
-                if(found_ms > 0) {
-                   s = String.format(getString(R.string.amatch_found_fmt), 
-                    found_ms/1000.0, search_duration_ms/1000.0);     
+                match_tries--;
+                Log.d(TAG,"AmatchMovieActivity.handleMessage() match_tries: " + match_tries + " found_ms: " + found_ms);
+                if(!(found_ms > 0)) {
+                    // not found  
+                    if( match_tries > 0 ) {
+                        s = "Not found " + match_tries + ". Do second try";
+                        Log.d(TAG,s);
+                        //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        do_sync();
+                    } else {
+                        s = String.format(getString(R.string.amatch_not_found_fmt),
+                        search_duration_ms/1000.0);   
+                        mv_found_display_view.setText(s);
+                    }
                 } else {
-                   s = String.format(getString(R.string.amatch_not_found_fmt),
-                    search_duration_ms/1000.0);     
+                    // found
+                    s = String.format(getString(R.string.amatch_found_fmt), 
+                    found_ms/1000.0, search_duration_ms/1000.0); 
+                    mv_found_display_view.setText(s);  
                 }
-                mv_found_display_view.setText(s);
+                
             }
         }
     };
@@ -156,18 +171,23 @@ public class AmatchMovieActivity extends Activity {
         }
         
 		bar.setTitle(R.string.play_view_title);
-        if(selectedMovie == null) {
-            //mv_title_view.setText("   ");
-        } else {
+        if(selectedMovie != null) {
             //bar.setTitle(selectedMovie.title);
             //mv_title_view.setText(selectedMovie.title);
-            if(gs.isLargScreen()) {
-                mv_sync_img.setImageURI(selectedMovie.getImgUri());
-            } else {
-                RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(50,50);
-                mv_sync_img.setLayoutParams(parms);
-                mv_sync_img.setImageURI(selectedMovie.getImgUri());
-            }
+            RelativeLayout.LayoutParams parms = 
+                    new RelativeLayout.LayoutParams(gs.width,(int)(gs.height*0.3));
+                //parms.addRule(RelativeLayout.BELOW, mv_title_view.getId());
+            parms.addRule(RelativeLayout.ALIGN_RIGHT);
+            mv_sync_img.setLayoutParams(parms);
+            
+            mv_sync_img.setImageURI(selectedMovie.getImgUri());
+            //if(gs.isLargScreen()) {
+            //    mv_sync_img.setImageURI(selectedMovie.getImgUri());
+            //} else {
+            //    RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(50,50);
+            //    mv_sync_img.setLayoutParams(parms);
+            //    mv_sync_img.setImageURI(selectedMovie.getImgUri());
+            //}
             //mv_play_desc.setText(StringUtils.abbreviate(selectedMovie.desc, 200));
 
             if(gs.amatch.isMediaPlayerPlaying) {
@@ -214,25 +234,30 @@ public class AmatchMovieActivity extends Activity {
 		return ret;
 	}
 
+    public void do_sync()
+    {
+        Log.d(TAG,"AmatchMovieActivity.do_sync()");
+        if(!gs.amatch.isMediaPlayerReady)
+        {
+            Log.d(TAG,"do_sync(): MediaPlayer still not Ready.");
+            Toast.makeText(getApplicationContext(), R.string.mediaplayer_not_ready, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(gs.amatch.isMatching)
+        {
+            Toast.makeText(getApplicationContext(), R.string.still_in_progress_wait, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mv_found_display_view.setText(R.string.wait_synchronizing);        
+        mv_seekbar.setProgress(0);
+        mv_seekbar_handler.postDelayed(UpdateTranslationTime,100);
+        gs.amatch.start_recording_thread();
+    }
+
     public void btn_start_searchClick(View view)
 	{
-		Log.d(TAG,"AmatchMovieActivity.btn_start_searchClick()");
-		if(!gs.amatch.isMediaPlayerReady)
-		{
-			Log.d(TAG,"btn_start_searchClick(): MediaPlayer still not Ready.");
-			Toast.makeText(getApplicationContext(), R.string.mediaplayer_not_ready, Toast.LENGTH_SHORT).show();
-			return;
-		}
-		if(gs.amatch.isMatching)
-		{
-			Toast.makeText(getApplicationContext(), R.string.still_in_progress_wait, Toast.LENGTH_SHORT).show();
-			return;
-		}
-		mv_found_display_view.setText(R.string.wait_synchronizing);
-		
-		mv_seekbar.setProgress(0);
-		mv_seekbar_handler.postDelayed(UpdateTranslationTime,100);
-		gs.amatch.start_recording_thread();
+        match_tries = MAX_SYNC_TRIES;
+		do_sync();
 	}
 
     public void btn_stopClick(View view)
