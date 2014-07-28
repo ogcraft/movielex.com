@@ -44,6 +44,10 @@ import android.content.Context;
 import android.view.WindowManager;
 import android.view.Display;
 import android.graphics.Point;
+import android.accounts.AccountManager;
+import android.accounts.Account;
+import android.telephony.TelephonyManager;
+import android.provider.Settings;
 
 /**
 * This is a global state for MoovieFishApp
@@ -76,6 +80,9 @@ public class MFApplication extends Application
     //static String moovifishSite = "http://192.168.10.109:3000";
     public int height = 0;
     public int width = 0;
+    public String google_account = "";
+    public String device_id = "";
+    public String androidOS = "";
     public boolean expireMovieDataCache = false;
     static final String BASE_URL = "http://mooviefish.com";
     static final String RESOURCE_PREFIX = BASE_URL + "/files/";
@@ -88,6 +95,29 @@ public class MFApplication extends Application
     public SharedPreferences sharedPrefs;
 
     public List<MovieItem> movieItems;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT
+                + " appVer: " + appVersion + " amatchVer: " + amatchVersion);
+
+        if( Build.VERSION.SDK_INT >= 9){
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy); 
+        }
+
+        amatch = Amatch.initInstance(MFApplication.this);
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        root_path = findRootPath();
+        google_account = getGoogleAccount();
+        androidOS = Build.VERSION.RELEASE;
+        device_id = getDeviceId(getApplicationContext());
+        Log.d(TAG,"MFApplication.onCreate(): device_id: " + device_id + " androidOS: " + androidOS);
+
+    }
 
     public String getTAG() {
       return TAG;
@@ -190,26 +220,7 @@ public class MFApplication extends Application
 
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d(TAG, "MFApplication.onCreate(): VERSION.SDK_INT: " + Build.VERSION.SDK_INT
-				+ " appVer: " + appVersion + " amatchVer: " + amatchVersion);
-
-        if( Build.VERSION.SDK_INT >= 9){
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy); 
-        }
-
-        amatch = Amatch.initInstance(MFApplication.this);
-
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        root_path = findRootPath();
-        //getMovieItems();
-    }
-
-
+    
     public static String getStringFromFile (String filePath) throws Exception {
         File fl = new File(filePath);
         FileInputStream fin = new FileInputStream(fl);
@@ -684,5 +695,94 @@ public static int getHeight(Context mContext){
         height = display.getHeight();  // Deprecated
     }
     return height;
+}
+
+public String getGoogleAccount() {
+
+    AccountManager manager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+    Account[] list = manager.getAccounts();
+    for(Account account: list)
+    {
+        Log.d(TAG,"MFApplication.collectAccountInfo(): account: " + account.toString());
+        if(account.type.equalsIgnoreCase("com.google"))
+        {
+            return account.name;
+        }
+    }
+    return null;
+}
+
+// How to get unique device id from:
+// http://stackoverflow.com/questions/17046436/android-settings-secure-android-id
+//
+public static String getDeviceId(Context context) {
+    String id = getUniqueID(context);
+    if (id == null)
+        id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    return id;
+}
+
+private static String getUniqueID(Context context) {
+
+    String telephonyDeviceId = "NoTelephonyId";
+    String androidDeviceId = "NoAndroidId";
+
+    // get telephony id
+    try {
+        final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        telephonyDeviceId = tm.getDeviceId();
+        if (telephonyDeviceId == null) {
+            telephonyDeviceId = "NoTelephonyId";
+        }
+    } catch (Exception e) {
+    }
+
+    // get internal android device id
+    try {
+        androidDeviceId = android.provider.Settings.Secure.getString(context.getContentResolver(),
+                android.provider.Settings.Secure.ANDROID_ID);
+        if (androidDeviceId == null) {
+            androidDeviceId = "NoAndroidId";
+        }
+    } catch (Exception e) {
+
+    }
+
+    // build up the uuid
+    try {
+        String id = getStringIntegerHexBlocks(androidDeviceId.hashCode())
+                + "-"
+                + getStringIntegerHexBlocks(telephonyDeviceId.hashCode());
+
+        return id;
+    } catch (Exception e) {
+        return "0000-0000-1111-1111";
+    }
+}
+
+public static String getStringIntegerHexBlocks(int value) {
+    String result = "";
+    String string = Integer.toHexString(value);
+
+    int remain = 8 - string.length();
+    char[] chars = new char[remain];
+    Arrays.fill(chars, '0');
+    string = new String(chars) + string;
+
+    int count = 0;
+    for (int i = string.length() - 1; i >= 0; i--) {
+        count++;
+        result = string.substring(i, i + 1) + result;
+        if (count == 4) {
+            result = "-" + result;
+            count = 0;
+        }
+    }
+
+    if (result.startsWith("-")) {
+        result = result.substring(1, result.length());
+    }
+
+    return result;
 }
 } // end of MVApplication

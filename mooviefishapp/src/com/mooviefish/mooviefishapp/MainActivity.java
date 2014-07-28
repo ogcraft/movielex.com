@@ -58,8 +58,9 @@ public class MainActivity extends Activity  implements
     	super.onCreate(savedInstanceState);
     	
     	gs = (MFApplication) getApplication();
-    	TAG = gs.getTAG();
-        gs.width = MFApplication.getWidth(getApplicationContext());
+        TAG = gs.getTAG();
+        
+    	gs.width = MFApplication.getWidth(getApplicationContext());
         gs.height = MFApplication.getHeight(getApplicationContext());
         Log.d(TAG, "MainActivity.onCreate h: " + gs.height + " w: " + gs.width);
         //Log.d(TAG,"MainActivity.onCreate");
