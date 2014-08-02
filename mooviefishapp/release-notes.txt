@@ -1,4 +1,0 @@
-1.3.10
-
-Fixed portrait orientation in the main view.
-Additional synchronization in case the first attempt failed
