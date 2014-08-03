@@ -162,8 +162,11 @@ public class MFApplication extends Application
                     Log.d(TAG,"Directory is not created");
                     Toast.makeText(getApplicationContext(), "Directory " + p + " is not created", Toast.LENGTH_SHORT).show();
                 }
+				//try {
+				//	Thread.sleep(1000);
+				//} catch (InterruptedException e) {}
             }
-        return mf_dir;
+        return p;
     }
 
     public String findRootPath1() {

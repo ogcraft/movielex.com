@@ -26,7 +26,7 @@
 	<string name="playing_info_fmt" formatted="false">Проигрывается %s из %s</string>
 	<string name="amatch_not_found_fmt" formatted="false">Ошибка синхронизации. Поиск занял: %.02f сек.\n Повторите попытку</string>
 
-	<string name="amatch_found_fmt" formatted="false">Синхронизированно на %.02f сек\n Поиск занял %.02f сек</string>
+	<string name="amatch_found_fmt" formatted="false">Синхронизировано на %.02f сек\n Поиск занял %.02f сек</string>
 <!--
 	<string name="amatch_found_fmt" formatted="false">Приятного просмотра!</string>
 -->	

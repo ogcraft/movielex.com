@@ -168,7 +168,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
             //    "The movie details would appear on clicking this icon",
             //    Toast.LENGTH_LONG).show();
 
-            if(selectedMovie != null) {
+            if(selectedMovie != null && selectedMovie.src_url.length() > 6  ) {
                 Log.d(TAG, "MovieDetailsActivity open " + selectedMovie.src_url);
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, 
                     Uri.parse(selectedMovie.src_url));
