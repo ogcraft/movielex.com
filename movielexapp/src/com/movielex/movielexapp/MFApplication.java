@@ -66,7 +66,7 @@ import android.provider.Settings;
 
 public class MFApplication extends Application
 {
-	public static final String appVersion = "1.0.1"; 
+	public static final String appVersion = "1.0.2"; 
 	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MovieLexApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MovieLex/";
