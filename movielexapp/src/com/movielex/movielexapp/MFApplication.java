@@ -90,6 +90,7 @@ public class MFApplication extends Application
     static final String GETMOVIES_REST = "%s/api/movies/%s";
     static final String GETMOVIEDETAIL_REST = "%s/api/movie/%s/%s";
     static final String PUTUSERID_REST = "%s/api/user/%s";
+    static final String ACQUIRE_MOVIE_REST = "%s/api/acquire/%s/%s";
 	//http://www.movielex.com/api/acquire/11/1001
     static final String GETACQUIRE_PERMISSION_REST = "%s/api/acquire/%s/%s";
     public AQuery aq = new AQuery(this);

@@ -76,7 +76,7 @@ import android.net.Uri;
 
 public class MovieDetailsActivity extends Activity implements OnClickListener {
     public static final String MOVIE_POSITION = "MOVIE_POSITION";
-    public enum TransState { UNKNOWN, DOWNLOADING, DOWNLOADED};
+    public enum TransState { UNKNOWN, PURCHASED, DOWNLOADING, DOWNLOADED};
     private MFApplication gs; 
     private String TAG = "Moovie";
 	private String      data_root_path = "";
@@ -187,8 +187,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 
     public void mv_details_trans_get1_onClick(View v) {
         Log.d(TAG,"MovieDetailsActivity.mv_details_trans_get1_onClick():");
-    	//acquirePermissionForMovie("11");
-        do_switch_on_tarns_state();
+        do_switch_on_trans_state();
     }
 
     public boolean isFpkesExist() {
@@ -204,10 +203,13 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         return f.isFile() && f.length() > 100;
     }
 
-    private void do_switch_on_tarns_state() {
+    private void do_switch_on_trans_state() {
         switch(trans_state1) {
             case UNKNOWN:
-            load_fpkeys();
+    		acquirePermissionForMovie();
+            break;
+            case PURCHASED:
+			load_fpkeys();
             break;
             case DOWNLOADED:
             if( isFpkesExist() && isTranslationExist(transLang)) { 
@@ -228,13 +230,14 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 
     }
 
-    public boolean acquirePermissionForMovie(String did) {
-		if(selectedMovie == null) {
-            Log.d(TAG,"MovieDetailsActivity.acquirePermissionForMovie() Fails: selectedMovie is null");
+    public boolean acquirePermissionForMovie() {
+		if(selectedMovie == null || gs.device_id.length() < 2 ) {
+            Log.d(TAG,"MovieDetailsActivity.acquirePermissionForMovie() device_id: " 
+					+ gs.device_id + " Fails: selectedMovie is null");
 			return false;
 		}
         String url = String.format(
-				gs.GETACQUIRE_PERMISSION_REST, gs.BASE_URL, did, selectedMovie.id);
+				gs.GETACQUIRE_PERMISSION_REST, gs.BASE_URL, gs.device_id, selectedMovie.id);
         Log.d(TAG, "acquirePermissionForMovie(): url: " + url);
 
 		gs.aq.ajax(url, JSONObject.class, new AjaxCallback<JSONObject>() {
@@ -251,9 +254,11 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 					}
 					if(permission) {
 						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission true");
-						do_switch_on_tarns_state();
+                        trans_state1 = TransState.PURCHASED;
+						do_switch_on_trans_state();
 					} else {
 						Log.d(TAG, "MovieDetailsActivity.acquirePermissionForMovie(): got permission false");
+                        trans_state1 = TransState.UNKNOWN;
             			Toast.makeText(getApplicationContext(),
             			"You have no permission to play this movie",
             			Toast.LENGTH_LONG).show();
