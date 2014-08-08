@@ -50,6 +50,8 @@ import android.accounts.AccountManager;
 import android.accounts.Account;
 import android.telephony.TelephonyManager;
 import android.provider.Settings;
+import android.app.AlertDialog.Builder;
+import android.app.AlertDialog;
 
 /**
 * This is a global state for MovieLexApp
@@ -99,11 +101,51 @@ public class MFApplication extends Application
 	public String inappBase64EncodedPublicKey = "";
     public AQuery aq = new AQuery(this);
     public SharedPreferences sharedPrefs;
-	// The InApp helper object
-	public IabHelper iabHelper;
-
 
     public List<MovieItem> movieItems;
+
+	// The InApp helper object
+	public IabHelper iabHelper;
+    IabHelper.QueryInventoryFinishedListener iabGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+            Log.d(TAG, "IAB Query inventory finished.");
+
+            // Have we been disposed of in the meantime? If so, quit.
+            if (iabHelper == null) return;
+
+            // Is it a failure?
+            if (result.isFailure()) {
+                complain("IAB Failed to query inventory: " + result);
+                return;
+            }
+
+            Log.d(TAG, "IAB Query inventory was successful.");
+
+            // Update Ui if needed;
+            //setWaitScreen(false); // Enables or disables the "please wait" screen.
+            Log.d(TAG, "IAB Initial inventory query finished; enabling main UI.");
+        }
+    };
+
+	// Enables or disables the "please wait" screen.
+    //void setWaitScreen(boolean set) {
+    //    findViewById(R.id.screen_main).setVisibility(set ? View.GONE : View.VISIBLE);
+    //    findViewById(R.id.screen_wait).setVisibility(set ? View.VISIBLE : View.GONE);
+    //}
+
+	void complain(String message) {
+        Log.e(TAG, "**** TrivialDrive Error: " + message);
+        alert("Error: " + message);
+    }
+	
+	void alert(String message) {
+        AlertDialog.Builder bld = new AlertDialog.Builder(this);
+        bld.setMessage(message);
+        bld.setNeutralButton("OK", null);
+        Log.d(TAG, "Showing alert dialog: " + message);
+        bld.create().show();
+    }
+
 
     @Override
     public void onCreate() {
@@ -149,13 +191,33 @@ public class MFApplication extends Application
 		
 		// Create the InApp helper, passing it our context and the public key to verify signatures with
         Log.d(TAG, "Creating IAB helper.");
-		
 
         iabHelper = new IabHelper(ctx, getInappBase64EncodedPublicKey());
 
         // enable debug logging (for a production application, you should set this to false).
         iabHelper.enableDebugLogging(true);
 
+		// Start setup. This is asynchronous and the specified listener
+        // will be called once setup completes.
+        Log.d(TAG, "Starting IAB setup.");
+        iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                Log.d(TAG, "IAB Setup finished.");
+
+                if (!result.isSuccess()) {
+                    // Oh noes, there was a problem.
+                    complain("Problem setting up in-app billing: " + result);
+                    return;
+                }
+
+                // Have we been disposed of in the meantime? If so, quit.
+                if (iabHelper == null) return;
+
+                // IAB is fully set up. Now, let's get an inventory of stuff we own.
+                Log.d(TAG, "IAB Setup successful. Querying inventory.");
+                iabHelper.queryInventoryAsync(iabGotInventoryListener);
+            }
+        });
 	}
 
 	///////////////////////////////////////////////////////////////
