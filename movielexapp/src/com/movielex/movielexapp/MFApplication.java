@@ -1,5 +1,7 @@
 package com.movielex.movielexapp;
+
 import amatch_generated.amatch_interface;
+import com.movielex.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,8 +96,12 @@ public class MFApplication extends Application
     static final String ACQUIRE_MOVIE_REST = "%s/api/acquire/%s/%s";
 	//http://www.movielex.com/api/acquire/11/1001
     static final String GETACQUIRE_PERMISSION_REST = "%s/api/acquire/%s/%s";
+	public String inappBase64EncodedPublicKey = "";
     public AQuery aq = new AQuery(this);
     public SharedPreferences sharedPrefs;
+	// The InApp helper object
+	public IabHelper iabHelper;
+
 
     public List<MovieItem> movieItems;
 
@@ -109,6 +115,8 @@ public class MFApplication extends Application
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy); 
         }
+		
+		inappBase64EncodedPublicKey = getInappBase64EncodedPublicKey();
 
         amatch = Amatch.initInstance(MFApplication.this);
 
@@ -121,7 +129,7 @@ public class MFApplication extends Application
         Log.d(TAG,"MFApplication.onCreate(): device_id: " + device_id + " androidOS: " + androidOS);
 
     }
-
+	
     public String getTAG() {
       return TAG;
     }
@@ -131,7 +139,26 @@ public class MFApplication extends Application
     public String getRootPath() {
         return root_path;
     }
-    
+	/////////////////////////  InApp billing //////////////////////    
+	public String getInappBase64EncodedPublicKey() {
+		String s = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6GMDkWtD0BdVkZoICr8jEah5pKyXKEUI3X0U0yf5akCgousendLw8QnS/Bkr+cQwadH63bLp9uhjG7FuE4OrHdvzhvbWFokVloyrZ8ijkvBp9s0u8heCCedQH4cSx3jpVgYUtPlAJlJ/P5rHkMivjA8cZwTopD5V3NxaTUVz3qO+Yei9XWxcri2FPchEhaNpRtCqVstVGPjn7JsAXpYnt2KB4Fhx+jg2Rr1rH0mKmzIbvZ3uju3wGt1BPv2qAxAHVKTbABWerJRFf6icfFJMQz/Tqd2Vt2n/GsSUKTBZe+JbVLEI1v/wHHRpETn91VsU0p0+Xtri9VRwVkW+Jm/9swIDAQAB";
+		return s;
+	}
+	
+	public void createIabHelper(Context ctx) {
+		
+		// Create the InApp helper, passing it our context and the public key to verify signatures with
+        Log.d(TAG, "Creating IAB helper.");
+		
+
+        iabHelper = new IabHelper(ctx, getInappBase64EncodedPublicKey());
+
+        // enable debug logging (for a production application, you should set this to false).
+        iabHelper.enableDebugLogging(true);
+
+	}
+
+	///////////////////////////////////////////////////////////////
     public String getDataLang() {
         return sharedPrefs.getString("data_lang", "ru");
     }

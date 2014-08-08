@@ -5,6 +5,8 @@ All rights reserved.
 */
 
 package com.movielex.movielexapp;
+
+import com.movielex.util.*;
 import com.lamerman.FileDialog;
 import com.lamerman.SelectionMode;
 import java.io.File;
@@ -101,6 +103,9 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         TAG = gs.getTAG();
         transLang = gs.getTransLang();
         setContentView(R.layout.movie_details_view);
+		
+		gs.createIabHelper(this);
+
         ActionBar bar = getActionBar();
         bar.setBackgroundDrawable(getResources().getDrawable(R.drawable.header_background));
         
