@@ -71,7 +71,7 @@ import android.app.AlertDialog;
 public class MFApplication extends Application
 {
     public static final String appName = "MovieLexApp";
-	public static final String appVersion = "1.0.3"; 
+	public static final String appVersion = "1.0.4"; 
 	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MovieLexApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MovieLex/";
@@ -218,6 +218,11 @@ public class MFApplication extends Application
                 iabHelper.queryInventoryAsync(iabGotInventoryListener);
             }
         });
+	}
+
+	public void unbindIabHelper() {
+		if (iabHelper != null) iabHelper.dispose();
+		iabHelper = null;
 	}
 
 	///////////////////////////////////////////////////////////////

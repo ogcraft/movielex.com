@@ -160,6 +160,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     public void onDestroy(){
     	super.onDestroy();
     	Log.d(TAG, "MovieDetailsActivity.onDestroy()");
+		gs.unbindIabHelper();
     }
 
     public void onClick(View v) {
