@@ -71,11 +71,12 @@ import android.app.AlertDialog;
 public class MFApplication extends Application
 {
     public static final String appName = "MovieLexApp";
-	public static final String appVersion = "1.0.4"; 
+	public static final String appVersion = "1.0.5"; 
 	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MovieLexApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MovieLex/";
 	public static Amatch amatch = null;
+	public static boolean isAppValid = true;
     private static final Pattern DIR_SEPARATOR = Pattern.compile("/");
     static int CONNECTION_TIMEOUT = 0; //msec
     static int DATARETRIEVAL_TIMEOUT = 0; //msec
@@ -115,7 +116,7 @@ public class MFApplication extends Application
 
             // Is it a failure?
             if (result.isFailure()) {
-                complain("IAB Failed to query inventory: " + result);
+                //complain("IAB Failed to query inventory: " + result);
                 return;
             }
 
@@ -133,13 +134,8 @@ public class MFApplication extends Application
     //    findViewById(R.id.screen_wait).setVisibility(set ? View.VISIBLE : View.GONE);
     //}
 
-	void complain(String message) {
-        Log.e(TAG, "**** TrivialDrive Error: " + message);
-        alert("Error: " + message);
-    }
-	
-	void alert(String message) {
-        AlertDialog.Builder bld = new AlertDialog.Builder(this);
+	void alert(Context ctx, String message) {
+        AlertDialog.Builder bld = new AlertDialog.Builder(ctx);
         bld.setMessage(message);
         bld.setNeutralButton("OK", null);
         Log.d(TAG, "Showing alert dialog: " + message);
@@ -195,7 +191,7 @@ public class MFApplication extends Application
         iabHelper = new IabHelper(ctx, getInappBase64EncodedPublicKey());
 
         // enable debug logging (for a production application, you should set this to false).
-        iabHelper.enableDebugLogging(true);
+        //iabHelper.enableDebugLogging(true);
 
 		// Start setup. This is asynchronous and the specified listener
         // will be called once setup completes.
@@ -206,7 +202,7 @@ public class MFApplication extends Application
 
                 if (!result.isSuccess()) {
                     // Oh noes, there was a problem.
-                    complain("Problem setting up in-app billing: " + result);
+                    //complain("Problem setting up in-app billing: " + result);
                     return;
                 }
 
@@ -444,39 +440,6 @@ public class MFApplication extends Application
             Log.d(TAG, "resolveResourceForMovie() After callback status: " + status.getCode());
         }
         return fn;  
-    }
-
-    public boolean putUserId() {
-		//{"account":"xyz","device_id":"11","os":"android","osver":"4.2.2","appver":"1.0.0","amatchver":"1.35"}
-        String url = String.format(PUTUSERID_REST, BASE_URL, device_id);
-        Log.d(TAG, "putUserId(): url: " + url);
-
-		JSONObject input = new JSONObject();
-		try {
-			input.putOpt("account", google_account);
-			input.putOpt("device_id", device_id);
-			input.putOpt("os", "android");
-			input.putOpt("osver", androidOS);
-			input.putOpt("appname", appName);
-			input.putOpt("appver", appVersion);
-			input.putOpt("amatchver", amatchVersion);
-		} catch (JSONException e) {
-			Log.d(TAG,"putUserId() Failed create json");
-			return false;
-		}
-		Log.d(TAG, "putUserId(): json: " + input.toString());
-
-		AjaxCallback<JSONObject> cb = new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject html, AjaxStatus status) {        
-				Log.d(TAG, "putUserId callback: " + html);
-			}
-		};
-
-		aq.put(url, input, JSONObject.class, cb);
-        
-		Log.d(TAG, "putUserId() After callback status");
-        return true;  
     }
 
 	public JSONArray getJSONFromFile( File fl) {

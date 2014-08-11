@@ -140,6 +140,11 @@ public class AmatchMovieActivity extends Activity {
         
         gs = (MFApplication) getApplication();
         TAG = gs.getTAG();
+		if(gs.isAppValid == false) {
+			Log.d(TAG,"AmatchMovieActivity Exit application");
+			finish();
+			Process.killProcess( Process.myPid() ); 
+		}
         Log.d(TAG, "AmatchMovieActivity.onCreate(): before setContentView");
         setContentView(R.layout.movie_sync_view);
         ActionBar bar = getActionBar();

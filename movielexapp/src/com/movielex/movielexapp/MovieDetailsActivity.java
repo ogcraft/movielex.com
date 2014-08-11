@@ -101,6 +101,11 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         
         gs = (MFApplication) getApplication();
         TAG = gs.getTAG();
+		if(gs.isAppValid == false) {
+			Log.d(TAG,"MovieDetailsActivity Exit application");
+			finish();
+			Process.killProcess( Process.myPid() ); 
+		}
         transLang = gs.getTransLang();
         setContentView(R.layout.movie_details_view);
 		

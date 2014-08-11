@@ -14,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.content.Context;
 import android.app.ProgressDialog;
 import com.movielex.movielexapp.CustomListViewAdapter;
 import com.movielex.movielexapp.MFApplication;
@@ -37,6 +38,9 @@ import com.androidquery.callback.AjaxStatus;
 import android.view.ViewGroup.LayoutParams;
 import android.os.Process;
 import android.app.ActionBar;
+import android.app.AlertDialog.Builder;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import java.util.Timer;  
 import java.util.TimerTask; 
 
@@ -46,6 +50,7 @@ public class MainActivity extends Activity  implements
 	private MFApplication gs; 
 	private String TAG = "MovieLexApp";
     private final String test_id = "test";
+	private String failureReason = "";
     private ProgressDialog dialog;
     ListView listView;
     CustomListViewAdapter adapter;
@@ -59,6 +64,10 @@ public class MainActivity extends Activity  implements
     	
     	gs = (MFApplication) getApplication();
         TAG = gs.getTAG();
+		if(gs.isAppValid == false) {
+			Log.d(TAG,"Exit application");
+			MainActivity.exit(MainActivity.this);
+		}
         
     	gs.width = MFApplication.getWidth(getApplicationContext());
         gs.height = MFApplication.getHeight(getApplicationContext());
@@ -76,9 +85,8 @@ public class MainActivity extends Activity  implements
         //Toast.makeText(getApplicationContext(),
         // String.format("%dx%d Path: %s", gs.height, gs.width, gs.getRootPath()), Toast.LENGTH_SHORT).show();
 		
-		gs.putUserId();
+		putUserId();
         getMovieItems(); 
-        
     }
 
     public void onDestroy(){
@@ -92,6 +100,13 @@ public class MainActivity extends Activity  implements
         inflater.inflate(R.layout.menu, menu);
         return true;
     }
+
+	public static void exit(MainActivity a) {
+		//super.onBackPressed();
+		a.finish();
+		Log.d("MovieLexApp", "MainActivity.exit() pid: " + Process.myPid());
+		Process.killProcess( Process.myPid() ); 
+	}
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -115,9 +130,7 @@ public class MainActivity extends Activity  implements
                 //about.getWindow().setLayout(300, 300);
                 return true;
             case R.id.menu_exit:
-                //super.onBackPressed();
-                this.finish();
-                Process.killProcess( Process.myPid() ); 
+				MainActivity.exit(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -139,7 +152,21 @@ public class MainActivity extends Activity  implements
                 boolean status = bundle.getBoolean("DownloadStatus");
                 Log.d(TAG, "MainActivity: all Resources collected: status: " + status);
                 dialog.dismiss();  
-                showMovies(); 
+				showMovies(); 
+
+				if(gs.isAppValid == false) {
+					AlertDialog.Builder bld = new AlertDialog.Builder(MainActivity.this);
+					bld.setMessage("Error: " + failureReason);
+					bld.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dlg, int whichButton) {
+							dlg.dismiss();
+							Log.d(TAG,"Exit application");
+							MainActivity.exit(MainActivity.this);
+						}
+					});
+					bld.create().show();
+				}
+        
         }
     }; 
 
@@ -225,6 +252,60 @@ public class MainActivity extends Activity  implements
     }
 
     
+    public boolean putUserId() {
+		//{"account":"xyz","device_id":"11","os":"android","osver":"4.2.2","appver":"1.0.0","amatchver":"1.35"}
+        String url = String.format(gs.PUTUSERID_REST, gs.BASE_URL, gs.device_id);
+        Log.d(TAG, "putUserId(): url: " + url);
+
+		JSONObject input = new JSONObject();
+		try {
+			input.putOpt("account", gs.google_account);
+			input.putOpt("device_id", gs.device_id);
+			input.putOpt("os", "android");
+			input.putOpt("osver", gs.androidOS);
+			input.putOpt("appname", gs.appName);
+			input.putOpt("appver", gs.appVersion);
+			input.putOpt("amatchver", gs.amatchVersion);
+		} catch (JSONException e) {
+			Log.d(TAG,"putUserId() Failed create json");
+			return false;
+		}
+		Log.d(TAG, "putUserId(): json: " + input.toString());
+
+		AjaxCallback<JSONObject> cb = new AjaxCallback<JSONObject>() {
+			@Override
+			public void callback(String url, JSONObject resp, AjaxStatus status) {        
+				Log.d(TAG, "putUserId callback: " + resp.toString());
+				//{"reason_code":0,"reason":"Ok","result":"true","user_id":"d22f-cd6f-a32e-6eb2"}
+				boolean result = false;
+				int reason_code = -1;
+				String reason = "Unknown";
+				String uid = "";
+				try {
+					reason_code = resp.getInt("reason_code");
+					reason = resp.getString("reason");
+					result = resp.getBoolean("result");
+					uid = resp.getString("user_id");
+				} catch (JSONException e) {
+					Log.d(TAG, "putUserId callback: Json parsing failed");
+				}
+				if(result == false) {
+					gs.isAppValid = false;
+					failureReason = reason;
+					Log.d(TAG,"putUserId callback result: Error: " + reason);
+					//gs.alert(MainActivity.this, "Error: " + reason);
+					//Log.d(TAG,"putUserId callback Exit application");
+					//MainActivity.exit(MainActivity.this);
+				}
+			}
+		};
+
+		gs.aq.put(url, input, JSONObject.class, cb);
+        
+		Log.d(TAG, "putUserId() After callback status");
+        return true;  
+    }
+
 
 
 }
