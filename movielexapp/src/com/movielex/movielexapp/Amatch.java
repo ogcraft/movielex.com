@@ -33,6 +33,7 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder.AudioSource;
 import android.media.audiofx.AutomaticGainControl;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,7 +49,7 @@ import android.os.Message;
 import android.widget.Toast;
 
 public class Amatch implements 
-        OnPreparedListener, OnSeekCompleteListener, OnErrorListener {
+        OnPreparedListener, OnSeekCompleteListener, OnErrorListener, OnAudioFocusChangeListener {
 	private static Amatch instance;
     private MFApplication gs; 
 	private String TAG = "Amatch";
@@ -84,6 +85,7 @@ public class Amatch implements
 
 
     private MediaPlayer mp = null;
+	private AudioManager mAudioManager = null;
     private RecorderThread recorder_thread;
     
     Handler player_thread_handler = new Handler() {
@@ -143,11 +145,14 @@ public class Amatch implements
         gs = app;
         TAG = gs.getTAG();
         Log.d(TAG,"Amatch() constructor");
+		mAudioManager = (AudioManager) gs.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+	//	mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
     }   
        
     public void Release(){
     	Log.d(TAG, "Amatch.Release()");
     	mp.stop();
+		mAudioManager.abandonAudioFocus(this);
         if(recorder_thread != null){
             recorder_thread.finish();
             recorder_thread = null;
@@ -168,6 +173,7 @@ public class Amatch implements
         isMediaPlayerPlaying = false;
         if (mp == null) { 
             Log.d(TAG,"Amatch.createMediaPlayerForTranslation: Creating new MediaPlayer");
+			mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mp = new  MediaPlayer(); 
  
             // Make sure the media player will acquire a wake-lock while playing. If we don't do
@@ -391,4 +397,14 @@ public class Amatch implements
               interrupt();
             }
      };
+	
+	@Override
+	public void onAudioFocusChange(int focusChange) {
+		if(focusChange<=0) {
+			//LOSS -> PAUSE
+			stop_plaing_translation();
+		 } else {
+			//GAIN -> PLAY
+		}
+	}   
 }
