@@ -10,6 +10,7 @@
 
     <string name="download">Download</string>
     <string name="downloading">Downloading...</string>
+    <string name="download_transaltion">Download Translation</string>
     <string name="play">Play</string>
 	<string name="downloading_index">Downloading Index</string>
 	<string name="downloading_translation">Downloading Translation</string>

@@ -54,7 +54,7 @@
             android:id="@+id/mv_details_flag_img1"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/flag_ru"
+            android:src="@drawable/flag_world"
             android:layout_below="@id/mv_details_desc" />
          
         <TextView

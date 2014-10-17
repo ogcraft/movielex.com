@@ -68,15 +68,18 @@ import org.apache.commons.lang3.StringUtils;
 
 public class AmatchMovieActivity extends Activity {
     public static final String MOVIE_POSITION = "MOVIE_POSITION";
+    public static final String MOVIE_TRANSLATION_POSITION = "MOVIE_TRANSLATION_POSITION";
     private MFApplication gs; 
     private String TAG = "Moovie";
 	private String data_root_path = "";
 	private String track_keys_fn = null;
 	private String translation_fn = null;
     private int movie_position = -1;
+    private int movie_translation_position = -1;
     private final int MAX_SYNC_TRIES = 3;
     private int match_tries = MAX_SYNC_TRIES;
     private MovieItem selectedMovie = null;
+    private MovieTranslations   selectedTranslation = null;
     private ImageView   mv_sync_img;
     //private TextView    mv_progress_display_view;
     private TextView    mv_sync_play_time_left;
@@ -169,14 +172,18 @@ public class AmatchMovieActivity extends Activity {
         //gs.amatch.progress_display_view_handler = mv_progress_display_view_handler;
             
         movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
-        Log.d(TAG,"AmatchMovieActivity.onCreate() movie_position: " + movie_position);
+        movie_translation_position = getIntent().getIntExtra(MOVIE_TRANSLATION_POSITION, -1);
+        Log.d(TAG,"AmatchMovieActivity.onCreate() movie_position: " + movie_position + " movie_translation_position: " + movie_translation_position);
         
         if(movie_position != -1 && gs.movieItems != null) {
             selectedMovie = gs.movieItems.get(movie_position);
+            if(movie_translation_position != -1 && selectedMovie != null) {
+				selectedTranslation =  selectedMovie.translations.get(movie_translation_position);
+			}
         }
         
 		bar.setTitle(R.string.play_view_title);
-        if(selectedMovie != null) {
+        if(selectedMovie != null && selectedTranslation != null) {
             //bar.setTitle(selectedMovie.title);
             //mv_title_view.setText(selectedMovie.title);
             RelativeLayout.LayoutParams parms = 
@@ -198,7 +205,7 @@ public class AmatchMovieActivity extends Activity {
             if(gs.amatch.isMediaPlayerPlaying) {
                 Log.d(TAG,"AmatchMovieActivity.onCreate() already Playing do nothing");
                 mv_btn_start_search.setEnabled(false);
-            } else if(load_fpkeys() && load_translation_for_lang("ru")) {
+            } else if(load_fpkeys() && load_translation_for_lang(selectedTranslation.lang)) {
                 mv_found_display_view.setText("");
                 mv_btn_start_search.setEnabled(true);
             } else {
@@ -216,8 +223,7 @@ public class AmatchMovieActivity extends Activity {
     }
     
 	public boolean load_translation_for_lang(String lang) {
-		String url = selectedMovie.getTranslationFileName(lang);
-		String fn = gs.getFileNameForUrl(url, selectedMovie.id);
+		String fn = gs.getFileNameForUrl(selectedTranslation.file, selectedMovie.id);
         Log.d(TAG, "AmatchMovieActivity: translation fn: " + fn);
 		gs.amatch.createMediaPlayerForTranslation(fn);
 		return true;

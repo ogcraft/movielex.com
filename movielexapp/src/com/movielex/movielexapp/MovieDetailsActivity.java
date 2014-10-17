@@ -75,20 +75,26 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import org.apache.commons.lang3.StringUtils;
 import android.net.Uri;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 
 public class MovieDetailsActivity extends Activity implements OnClickListener {
     public static final String MOVIE_POSITION = "MOVIE_POSITION";
+    public static final String MOVIE_TRANSLATION_POSITION = "MOVIE_TRANSLATION_POSITION";
     public enum TransState { UNKNOWN, PURCHASED, DOWNLOADING, DOWNLOADED};
     private MFApplication gs; 
     private String TAG = "Moovie";
 	private String      data_root_path = "";
 	private String      transLang = "";
     private int         movie_position = -1;
+    private int         movie_translation_position = -1;
     private MovieItem   selectedMovie = null;
+    private MovieTranslations   selectedTranslation = null;
 	//private TextView    mv_title_view;
     private ImageView   mv_details_img;
     private TextView    mv_details_desc;
 
+	private ImageView	mv_details_flag_img1;
     private TextView    mv_details_trans_title1;
     private Button      mv_details_trans_get1;
     private TransState  trans_state1 = TransState.UNKNOWN;
@@ -106,7 +112,6 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 			finish();
 			Process.killProcess( Process.myPid() ); 
 		}
-        transLang = gs.getTransLang();
         setContentView(R.layout.movie_details_view);
 		
 		gs.createIabHelper(this);
@@ -117,12 +122,19 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         //mv_title_view = (TextView)findViewById(R.id.mv_detail_title);
         mv_details_img = (ImageView)findViewById(R.id.mv_details_img);
         mv_details_desc = (TextView)findViewById(R.id.mv_details_desc);
-        mv_details_trans_title1 = (TextView)findViewById(R.id.mv_details_trans_title1);
-        mv_details_trans_title1.setText(R.string.ru_lang_name);
-        mv_details_trans_get1 = (Button)findViewById(R.id.mv_details_trans_get1);
-        mv_details_trans_get1.setText(R.string.download);
-        mv_details_trans_get1.setOnClickListener(this);
+        
+		//mv_details_trans_title1 = (TextView)findViewById(R.id.mv_details_trans_title1);
+        //mv_details_trans_title1.setText(R.string.ru_lang_name);
+        //mv_details_trans_get1 = (Button)findViewById(R.id.mv_details_trans_get1);
+        //mv_details_trans_get1.setText(R.string.download);
+        //mv_details_trans_get1.setOnClickListener(this);
 
+        mv_details_flag_img1 = (ImageView)findViewById(R.id.mv_details_flag_img1);
+		mv_details_trans_title1 = (TextView)findViewById(R.id.mv_details_trans_title1);
+        mv_details_trans_title1.setText("   ");
+        mv_details_trans_get1 = (Button)findViewById(R.id.mv_details_trans_get1);
+        mv_details_trans_get1.setText(R.string.download_transaltion);
+        mv_details_trans_get1.setOnClickListener(this);
         
         movie_position = getIntent().getIntExtra(MOVIE_POSITION, -1);
         Log.d(TAG,"MovieDetailsActivity.onCreate() movie_position: " + movie_position);
@@ -133,10 +145,6 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
             selectedMovie = gs.movieItems.get(movie_position);
         }
         
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-        //      android.R.layout.simple_list_item_1, android.R.id.text1, langs);
-        //mv_list_view.setAdapter(adapter); 
-        //mv_list_view.setOnItemClickListener(this);
         bar.setTitle(R.string.details_view_title);
 		if(selectedMovie != null) {
             //mv_title_view.setText(selectedMovie.title);
@@ -146,6 +154,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                 //    MFApplication.MAX_CHAR_ALLOWED_MOVIE_DETAILS_DESC_VIEW));
                  
             //}
+			Log.d(TAG,"selectedMovie.translations.size: " + selectedMovie.translations.size());
             RelativeLayout.LayoutParams parms = 
                     new RelativeLayout.LayoutParams(gs.width,(int)(gs.height*0.6));
                 //parms.addRule(RelativeLayout.BELOW, mv_title_view.getId());
@@ -155,10 +164,10 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
             mv_details_img.setOnClickListener(this);
             mv_details_img.setImageURI(selectedMovie.getImgUri());
 
-            if( isFpkesExist() && isTranslationExist(transLang)) {
-                trans_state1 = TransState.DOWNLOADED;
-                mv_details_trans_get1.setText(R.string.play); 
-            }
+            //if( isFpkesExist() && isTranslationExist(transLang)) {
+            //    trans_state1 = TransState.DOWNLOADED;
+            //    mv_details_trans_get1.setText(R.string.play); 
+            //}
         }
 	}
 
@@ -208,8 +217,8 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     }
     
     public boolean isTranslationExist(String lang) {
-        final String url = selectedMovie.getTranslationFileName(lang);
-        final String fn = gs.getFileNameForUrl(url, selectedMovie.id);
+        final String fn = gs.getFileNameForUrl(selectedTranslation.file, selectedMovie.id);
+		Log.d(TAG,"isTranslationExist() for file: " + fn);
         File f = new File(fn);
         return f.isFile() && f.length() > 100;
     }
@@ -217,18 +226,21 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
     private void do_switch_on_trans_state() {
         switch(trans_state1) {
             case UNKNOWN:
-    		acquirePermissionForMovie();
+    		//acquirePermissionForMovie();
+			askForTranslationLanguage();
             break;
             case PURCHASED:
-			load_fpkeys();
+			load_flag();
             break;
             case DOWNLOADED:
             if( isFpkesExist() && isTranslationExist(transLang)) { 
                 Log.d(TAG,"MainActivity start AmatchMovieActivity");
                 Intent movieActivity = new Intent(getApplicationContext(), AmatchMovieActivity.class);
                 movieActivity.putExtra(AmatchMovieActivity.MOVIE_POSITION, movie_position);
+                movieActivity.putExtra(AmatchMovieActivity.MOVIE_TRANSLATION_POSITION, movie_translation_position);
                 startActivity(movieActivity);
             } else {
+				Log.d(TAG,"do_switch_on_trans_state() isFpkesExist: " + isFpkesExist() + " isTranslationExist: " + isTranslationExist(transLang));
                 trans_state1 = TransState.UNKNOWN;
                 mv_details_trans_get1.setText(R.string.download); 
             }
@@ -240,6 +252,34 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
         
 
     }
+
+	public void askForTranslationLanguage() {
+		if( selectedMovie == null ) return;
+		Log.d(TAG, "askForTranslationLanguage(): size: " + selectedMovie.translations.size());	
+		//final String [] items=new String[selectedMovie.translations.size()];
+		List<String> translation_titles = new ArrayList<String>();
+        
+		for (MovieTranslations t : selectedMovie.translations) {
+			Log.d(TAG,"T: lang: " + t.lang + " file: " + t.file + " title: " + t.title + " img" + t.img);
+			translation_titles.add(t.title);
+		}
+
+		AlertDialog.Builder builder3 = new AlertDialog.Builder(MovieDetailsActivity.this);
+		String[] items = new String[translation_titles.size()]; 
+		translation_titles.toArray(items);
+		builder3.setTitle("Pick translation").setItems( items, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				movie_translation_position = which;
+				selectedTranslation =  selectedMovie.translations.get(movie_translation_position);
+				transLang = selectedTranslation.lang;
+				acquirePermissionForMovie();
+			}
+
+		});
+
+		builder3.show();
+	}
 
     public boolean acquirePermissionForMovie() {
 		if(selectedMovie == null || gs.device_id.length() < 2 ) {
@@ -282,6 +322,48 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 		return false;
 	}
 
+    public boolean load_flag() {
+		if(selectedTranslation == null) {
+            Log.d(TAG,"MovieDetailsActivity.load_flag() Fails: selectedTranslation is null");
+			return false;
+		}
+        //trans_state1 = TransState.DOWNLOADING;
+        //mv_details_trans_get1.setText(R.string.downloading);
+        String fn = gs.getRootPath() + selectedTranslation.img.substring(selectedTranslation.img.lastIndexOf("/") + 1);
+
+        Log.d(TAG,"MovieDetailsActivity.load_flag() fn: " + fn);
+        
+        File target = new File(fn);
+        if( !target.isFile() || target.length() < 10) {
+
+            gs.aq.download(selectedTranslation.img, target, new AjaxCallback<File>(){
+
+                public void callback(String url, File file, AjaxStatus status) {
+
+                    if(file != null){
+                        Log.d(TAG, "load_flag():" + file.length() + ":" + file);
+                        //trans_state1 = TransState.DOWNLOADED;
+                        //mv_details_trans_get1.setText(R.string.play);
+						mv_details_flag_img1.setImageURI(Uri.fromFile(file));
+						mv_details_trans_title1.setText(selectedTranslation.title);
+                        load_fpkeys();
+                    }else{
+                        Log.d(TAG, "Failed download: "  + selectedTranslation.img);
+						Toast.makeText(getApplicationContext(), "Failed to load " + selectedTranslation.img, Toast.LENGTH_LONG).show();
+                        trans_state1 = TransState.UNKNOWN;
+                        //mv_details_trans_get1.setText(R.string.download);
+                    }
+                }
+
+            });
+        } else {
+            Log.d(TAG, "load_flag(): File " + fn + " exist");
+			mv_details_flag_img1.setImageURI(Uri.fromFile(target));
+			mv_details_trans_title1.setText(selectedTranslation.title);
+            load_fpkeys();
+        }
+        return true;
+	}
     public boolean load_fpkeys() {
 		if(selectedMovie == null) {
             Log.d(TAG,"MovieDetailsActivity.load_fpkeys() Fails: selectedMovie is null");
@@ -310,7 +392,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                 public void callback(String url, File file, AjaxStatus status) {
 
                     if(file != null){
-                        Log.d(TAG, " Downloaded File:" + file.length() + ":" + file);
+                        Log.d(TAG, "load_fpkeys() Downloaded File:" + file.length() + ":" + file);
                         trans_state1 = TransState.DOWNLOADED;
                         mv_details_trans_get1.setText(R.string.play);
                         if(fpkey_download_dialog != null) {
@@ -341,7 +423,9 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
             trans_state1 = TransState.UNKNOWN;
             return false;
         }
-        final String url = selectedMovie.getTranslationFileName(lang);
+        Log.d(TAG,"MovieDetailsActivity.load_translation_for_lang() lang: " + lang);
+        //final String url = selectedMovie.getTranslationFileName(lang);
+        final String url = selectedTranslation.file;
         Log.d(TAG, "MovieDetailsActivity.load_translation_for_lang: url: " + url);
         trans_state1 = TransState.DOWNLOADING;
         mv_details_trans_get1.setText(R.string.downloading);
@@ -366,7 +450,7 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
                 public void callback(String url, File file, AjaxStatus status) {
 
                     if(file != null){
-                        Log.d(TAG, " Downloaded File:" + file.length() + ":" + file);
+                        Log.d(TAG, "load_translation_for_lang() Downloaded File:" + file.length() + ":" + file);
                         if(trans_download_dialog != null) {
                             trans_download_dialog.dismiss(); 
                         }

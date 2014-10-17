@@ -71,7 +71,7 @@ import android.app.AlertDialog;
 public class MFApplication extends Application
 {
     public static final String appName = "MovieLexApp";
-	public static final String appVersion = "1.0.6"; 
+	public static final String appVersion = "1.0.7"; 
 	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MovieLexApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MovieLex/";
@@ -450,6 +450,7 @@ public class MFApplication extends Application
 			//json = getStringFromFile(json_fn);
         	FileInputStream fin = new FileInputStream(fl);
         	json = convertStreamToString(fin);
+			//json = testMovieJson;
 			//Make sure you close all streams.
 			fin.close();        
 			//Log.d(TAG, "json: " + json);
@@ -472,7 +473,6 @@ public class MFApplication extends Application
         String json_fn = getRootPath() + "movie_list.json";
         try {
     	// Making HTTP request
-
            Log.d(TAG, "json_fn: " + json_fn);
            json = getStringFromFile(json_fn);
            Log.d(TAG, "json: " + json);
@@ -594,7 +594,9 @@ public class MFApplication extends Application
                 storageSet.add(_group);
             }
             return storageSet;
-        }
+        
+		}
+
 /**
  * Raturns all available SD-Cards in the system (include emulated)
  *
@@ -606,72 +608,72 @@ public class MFApplication extends Application
  */
 
     public static String[] getStorageDirectories()
-{
-    // Final set of paths
-    final Set<String> rv = new HashSet<String>();
-    // Primary physical SD-CARD (not emulated)
-    final String rawExternalStorage = System.getenv("EXTERNAL_STORAGE");
-    // All Secondary SD-CARDs (all exclude primary) separated by ":"
-    final String rawSecondaryStoragesStr = System.getenv("SECONDARY_STORAGE");
-    // Primary emulated SD-CARD
-    final String rawEmulatedStorageTarget = System.getenv("EMULATED_STORAGE_TARGET");
-    if(TextUtils.isEmpty(rawEmulatedStorageTarget))
-    {
-        // Device has physical external storage; use plain paths.
-        if(TextUtils.isEmpty(rawExternalStorage))
-        {
-            // EXTERNAL_STORAGE undefined; falling back to default.
-            rv.add("/storage/sdcard0");
-        }
-        else
-        {
-            rv.add(rawExternalStorage);
-        }
-    }
-    else
-    {
-        // Device has emulated storage; external storage paths should have
-        // userId burned into them.
-        final String rawUserId;
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            rawUserId = "";
-        }
-        else
-        {
-            final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-            final String[] folders = DIR_SEPARATOR.split(path);
-            final String lastFolder = folders[folders.length - 1];
-            boolean isDigit = false;
-            try
-            {
-                Integer.valueOf(lastFolder);
-                isDigit = true;
-            }
-            catch(NumberFormatException ignored)
-            {
-            }
-            rawUserId = isDigit ? lastFolder : "";
-        }
-        // /storage/emulated/0[1,2,...]
-        if(TextUtils.isEmpty(rawUserId))
-        {
-            rv.add(rawEmulatedStorageTarget);
-        }
-        else
-        {
-            rv.add(rawEmulatedStorageTarget + File.separator + rawUserId);
-        }
-    }
-    // Add all secondary storages
-    if(!TextUtils.isEmpty(rawSecondaryStoragesStr))
-    {
-        // All Secondary SD-CARDs splited into array
-        final String[] rawSecondaryStorages = rawSecondaryStoragesStr.split(File.pathSeparator);
-        Collections.addAll(rv, rawSecondaryStorages);
-    }
-    return rv.toArray(new String[rv.size()]);
-}
+	{
+		// Final set of paths
+		final Set<String> rv = new HashSet<String>();
+		// Primary physical SD-CARD (not emulated)
+		final String rawExternalStorage = System.getenv("EXTERNAL_STORAGE");
+		// All Secondary SD-CARDs (all exclude primary) separated by ":"
+		final String rawSecondaryStoragesStr = System.getenv("SECONDARY_STORAGE");
+		// Primary emulated SD-CARD
+		final String rawEmulatedStorageTarget = System.getenv("EMULATED_STORAGE_TARGET");
+		if(TextUtils.isEmpty(rawEmulatedStorageTarget))
+		{
+			// Device has physical external storage; use plain paths.
+			if(TextUtils.isEmpty(rawExternalStorage))
+			{
+				// EXTERNAL_STORAGE undefined; falling back to default.
+				rv.add("/storage/sdcard0");
+			}
+			else
+			{
+				rv.add(rawExternalStorage);
+			}
+		}
+		else
+		{
+			// Device has emulated storage; external storage paths should have
+			// userId burned into them.
+			final String rawUserId;
+			if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
+			{
+				rawUserId = "";
+			}
+			else
+			{
+				final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+				final String[] folders = DIR_SEPARATOR.split(path);
+				final String lastFolder = folders[folders.length - 1];
+				boolean isDigit = false;
+				try
+				{
+					Integer.valueOf(lastFolder);
+					isDigit = true;
+				}
+				catch(NumberFormatException ignored)
+				{
+				}
+				rawUserId = isDigit ? lastFolder : "";
+			}
+			// /storage/emulated/0[1,2,...]
+			if(TextUtils.isEmpty(rawUserId))
+			{
+				rv.add(rawEmulatedStorageTarget);
+			}
+			else
+			{
+				rv.add(rawEmulatedStorageTarget + File.separator + rawUserId);
+			}
+		}
+		// Add all secondary storages
+		if(!TextUtils.isEmpty(rawSecondaryStoragesStr))
+		{
+			// All Secondary SD-CARDs splited into array
+			final String[] rawSecondaryStorages = rawSecondaryStoragesStr.split(File.pathSeparator);
+			Collections.addAll(rv, rawSecondaryStorages);
+		}
+		return rv.toArray(new String[rv.size()]);
+	}
 
 public static boolean createFolderForMovie(String folder_name) {
     
@@ -881,4 +883,7 @@ public static String getStringIntegerHexBlocks(int value) {
 
     return result;
 }
+
+static String testMovieJson = "[{\"movie-state\":\"active\",\"desc-short\":\"MovieLex демонстрационный фрагмент\",\"fpkeys-file\":\"http://movielex.com/files/1/somelikemovielex-en.fpkeys\",\"desc\":\"MovieLex демонстрационный фрагмент\",\"duration\":\"3 мин 35 сек\",\"year-released\":\"1959\",\"title\":\"В джазе только девушки\",\"id\":\"1\",\"shortname\":\"movielexdemo\",\"src-url\":\"\",\"img\":\"http://movielex.com/files/1/somelikemovielex.jpg\",\"translations\":[{\"desc\":\"From original dvd\",\"file\":\"http://movielex.com/files/1/somelikemovielex-ru.trans\",\"title\":\"Русский\",\"lang\":\"ru\",\"img\":\"http://movielex.com/files/flags/flag-ru.png\"}, {\"desc\":\"From original dvd\",\"file\":\"http://movielex.com/files/1/somelikemovielex-en.trans\",\"title\":\"English\",\"lang\":\"en\",\"img\":\"http://movielex.com/files/flags/flag-en.png\"}, {\"desc\":\"From original dvd\",\"file\":\"http://movielex.com/1/flags/somelikemovielex-de.trans\",\"title\":\"Deutsch\",\"lang\":\"de\",\"img\":\"http://movielex.com/files/flags/flag-de.png\"}]}]";
+
 } // end of MVApplication

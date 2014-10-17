@@ -11,6 +11,7 @@
 
     <string name="download">Загрузить</string>
     <string name="downloading">Загрузка...</string>
+    <string name="download_transaltion">Загрузить перевод</string>
     <string name="play">Слушать</string>
 
 	<string name="downloading_index">Загрузка индекса</string>
