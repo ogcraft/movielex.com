@@ -15,6 +15,7 @@
 	<string name="downloading_index">Downloading Index</string>
 	<string name="downloading_translation">Downloading Translation</string>
 	<string name="downloading_movies_data">Downloading Data</string>
+	<string name="peek_translation">Choose Language</string>
 
     <string name="ru_lang_name">Russian</string>
 

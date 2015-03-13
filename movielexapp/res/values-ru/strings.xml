@@ -17,6 +17,7 @@
 	<string name="downloading_index">Загрузка индекса</string>
 	<string name="downloading_translation">Загрузка перевода</string>
 	<string name="downloading_movies_data">Загрузка данных</string>
+	<string name="peek_translation">Выберите язык</string>
 	
 	<string name="ru_lang_name">Русский</string>
 

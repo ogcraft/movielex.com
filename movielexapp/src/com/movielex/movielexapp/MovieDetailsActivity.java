@@ -260,14 +260,14 @@ public class MovieDetailsActivity extends Activity implements OnClickListener {
 		List<String> translation_titles = new ArrayList<String>();
         
 		for (MovieTranslations t : selectedMovie.translations) {
-			Log.d(TAG,"T: lang: " + t.lang + " file: " + t.file + " title: " + t.title + " img" + t.img);
+			//Log.d(TAG,"T: lang: " + t.lang + " file: " + t.file + " title: " + t.title + " img" + t.img);
 			translation_titles.add(t.title);
 		}
 
 		AlertDialog.Builder builder3 = new AlertDialog.Builder(MovieDetailsActivity.this);
 		String[] items = new String[translation_titles.size()]; 
 		translation_titles.toArray(items);
-		builder3.setTitle("Pick translation").setItems( items, new DialogInterface.OnClickListener() {
+		builder3.setTitle(R.string.peek_translation).setItems( items, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				movie_translation_position = which;

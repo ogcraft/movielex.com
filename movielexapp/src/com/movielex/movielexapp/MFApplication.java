@@ -71,7 +71,7 @@ import android.app.AlertDialog;
 public class MFApplication extends Application
 {
     public static final String appName = "MovieLexApp";
-	public static final String appVersion = "1.0.7"; 
+	public static final String appVersion = "1.0.8"; 
 	public static final String amatchVersion = amatch_interface.AMATCH_VER;
 	private static final String TAG = "MovieLexApp";
 	private String root_path = Environment.getExternalStorageDirectory() + "/MovieLex/";
