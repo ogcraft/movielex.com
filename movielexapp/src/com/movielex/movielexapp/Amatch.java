@@ -246,7 +246,8 @@ public class Amatch implements
     public void  play_translation(String fn, long from_ms){
         // Play translation
         try {
-            Log.d(TAG,String.format("play_translation from %d ms", from_ms));
+            Log.d(TAG,String.format("play_translation from %d ms + delay: %d ms", from_ms, gs.getDelayMs()));
+			from_ms = from_ms + gs.getDelayMs();
             if(from_ms >= translationMaxDuration_ms)
             {
                 Log.d(TAG, String.format("play_translation(), requested time %d is more than Max Duration: %d",
