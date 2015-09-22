@@ -1,0 +1,6 @@
+  find . -name "*.apk"
+  ./gradlew clean
+  ./gradlew build
+
+
+
