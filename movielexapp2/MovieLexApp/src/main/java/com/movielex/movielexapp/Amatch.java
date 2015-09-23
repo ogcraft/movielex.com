@@ -9,6 +9,7 @@ import amatch_generated.amatch_interface;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder; 
 import java.nio.FloatBuffer; 
@@ -87,52 +88,110 @@ public class Amatch implements
     private MediaPlayer mp = null;
 	private AudioManager mAudioManager = null;
     private RecorderThread recorder_thread;
-    
-    Handler player_thread_handler = new Handler() {
+
+    private static class PlayerThreadHandler extends Handler {
+        private final WeakReference<Amatch> mActivity;
+
+        public PlayerThreadHandler(Amatch activity) {
+            mActivity = new WeakReference<Amatch>(activity);
+        }
+
         @Override
-        public void handleMessage(Message msg) {              
+        public void handleMessage(Message msg) {
+            Amatch activity = mActivity.get();
+            if (activity != null) {
                 Bundle bundle = msg.getData();
                 int i = bundle.getInt("FoundIndex");
                 long time_to_match_ms = bundle.getLong("time_to_match_ms");
-                Log.d(TAG,"FoundIndex: n = " + i);
-                
-                isMatching = false;
+                Log.d(activity.TAG, "FoundIndex: n = " + i);
 
-                matching_end_ms = System.currentTimeMillis();
+                activity.isMatching = false;
 
-                found_sec = i * amatch_interface.SEC_PER_KEY;
-                Log.d(TAG,"found_sec: " + found_sec);
-                
+                activity.matching_end_ms = System.currentTimeMillis();
+
+                activity.found_sec = i * amatch_interface.SEC_PER_KEY;
+                Log.d(activity.TAG, "found_sec: " + activity.found_sec);
+
                 // add delay from algorithm
                 //found_sec = (amatch_interface.delay_per_sec()+1) * found_sec;
                 //found_sec = found_sec + amatch_interface.num_sec_to_record();
 
-                Log.d(TAG,"Starting playing from " + found_sec + " sec");
-                
-                recording_end_ms = System.currentTimeMillis();
-                long recording_time_ms = recording_end_ms - recording_start_ms;
+                Log.d(activity.TAG, "Starting playing from " + activity.found_sec + " sec");
 
-                Log.d(TAG,String.format("**** recording_time_ms: %d (%d - %d)", 
-                                    recording_time_ms, recording_end_ms, recording_start_ms));
+                activity.recording_end_ms = System.currentTimeMillis();
+                long recording_time_ms = activity.recording_end_ms - activity.recording_start_ms;
+
+                Log.d(activity.TAG, String.format("**** recording_time_ms: %d (%d - %d)",
+                        recording_time_ms, activity.recording_end_ms, activity.recording_start_ms));
                 long calculated_ms = -1;
-                if( i > 10 ) {
-                    calculated_ms = (long)found_sec*1000 + recording_time_ms + 500; 
+                if (i > 10) {
+                    calculated_ms = (long) activity.found_sec * 1000 + recording_time_ms + 500;
                 }
                 //i = 11; calculated_ms = 25795; //OGG
-                if( i > 10 && 
-                    (calculated_ms < translationMaxDuration_ms)) {
-                    play_translation(translation_fn, (long) calculated_ms);
+                if (i > 10 &&
+                        (calculated_ms < activity.translationMaxDuration_ms)) {
+                    activity.play_translation(activity.translation_fn, (long) calculated_ms);
                 } else {
                     //play_recorded();
                 }
-                Message msg1 = found_display_view_handler.obtainMessage();
+                Message msg1 = activity.found_display_view_handler.obtainMessage();
                 Bundle bundle1 = new Bundle();
                 bundle1.putLong("found_ms", calculated_ms);
                 bundle1.putLong("search_duration_ms", recording_time_ms);
                 msg1.setData(bundle1);
-                found_display_view_handler.sendMessage(msg1);
+                activity.found_display_view_handler.sendMessage(msg1);
             }
-        }; 
+        }
+    }
+
+
+    private final PlayerThreadHandler player_thread_handler = new PlayerThreadHandler(this);
+
+//    Handler player_thread_handler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//                Bundle bundle = msg.getData();
+//                int i = bundle.getInt("FoundIndex");
+//                long time_to_match_ms = bundle.getLong("time_to_match_ms");
+//                Log.d(TAG,"FoundIndex: n = " + i);
+//
+//                isMatching = false;
+//
+//                matching_end_ms = System.currentTimeMillis();
+//
+//                found_sec = i * amatch_interface.SEC_PER_KEY;
+//                Log.d(TAG,"found_sec: " + found_sec);
+//
+//                // add delay from algorithm
+//                //found_sec = (amatch_interface.delay_per_sec()+1) * found_sec;
+//                //found_sec = found_sec + amatch_interface.num_sec_to_record();
+//
+//                Log.d(TAG,"Starting playing from " + found_sec + " sec");
+//
+//                recording_end_ms = System.currentTimeMillis();
+//                long recording_time_ms = recording_end_ms - recording_start_ms;
+//
+//                Log.d(TAG,String.format("**** recording_time_ms: %d (%d - %d)",
+//                                    recording_time_ms, recording_end_ms, recording_start_ms));
+//                long calculated_ms = -1;
+//                if( i > 10 ) {
+//                    calculated_ms = (long)found_sec*1000 + recording_time_ms + 500;
+//                }
+//                //i = 11; calculated_ms = 25795; //OGG
+//                if( i > 10 &&
+//                    (calculated_ms < translationMaxDuration_ms)) {
+//                    play_translation(translation_fn, (long) calculated_ms);
+//                } else {
+//                    //play_recorded();
+//                }
+//                Message msg1 = found_display_view_handler.obtainMessage();
+//                Bundle bundle1 = new Bundle();
+//                bundle1.putLong("found_ms", calculated_ms);
+//                bundle1.putLong("search_duration_ms", recording_time_ms);
+//                msg1.setData(bundle1);
+//                found_display_view_handler.sendMessage(msg1);
+//            }
+//        };
 
 	public static Amatch initInstance(MFApplication app) {
 		if (instance == null) {

@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder; 
-import java.nio.FloatBuffer; 
+import java.nio.FloatBuffer;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 import com.lamerman.FileDialog;
@@ -76,6 +77,8 @@ public class AmatchMovieActivity extends Activity {
 	private String translation_fn = null;
     private int movie_position = -1;
     private int movie_translation_position = -1;
+    private long start_sync_ms = 0;
+    private long got_match_result_start_ms = 0;
     private final int MAX_SYNC_TRIES = 3;
     private int match_tries = MAX_SYNC_TRIES;
     private MovieItem selectedMovie = null;
@@ -90,39 +93,92 @@ public class AmatchMovieActivity extends Activity {
 
     private TextView    mv_found_display_view;
     private Button      mv_btn_start_search;
-    
-	Handler mv_found_display_view_handler = new Handler() {
+
+    private static class FoundDisplayHandler extends Handler {
+        private final WeakReference<AmatchMovieActivity> mActivity;
+
+        public FoundDisplayHandler(AmatchMovieActivity activity) {
+            mActivity = new WeakReference<AmatchMovieActivity>(activity);
+        }
+
         @Override
-        public void handleMessage(Message msg) {              
-            Bundle bundle = msg.getData();
-            long found_ms = bundle.getLong("found_ms");
-            long search_duration_ms = bundle.getLong("search_duration_ms");
-            if(mv_found_display_view != null) {
-                String s = null;
-                match_tries--;
-                Log.d(TAG,"AmatchMovieActivity.handleMessage() match_tries: " + match_tries + " found_ms: " + found_ms);
-                if(!(found_ms > 0)) {
-                    // not found  
-                    if( match_tries > 0 ) {
-                        s = "Not found " + match_tries + ". Do second try";
-                        Log.d(TAG,s);
-                        //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-                        do_sync();
+        public void handleMessage(Message msg) {
+            AmatchMovieActivity activity = mActivity.get();
+            if (activity != null) {
+                Bundle bundle = msg.getData();
+                long found_ms = bundle.getLong("found_ms");
+                long search_duration_ms = bundle.getLong("search_duration_ms");
+                long calculated_search_duration_ms = System.currentTimeMillis() - activity.start_sync_ms;
+                Log.d(activity.TAG, String.format("OGG calculated_search_duration_ms: %d search_duration_ms: %d", calculated_search_duration_ms, search_duration_ms));
+                if(activity.mv_found_display_view != null) {
+                    String s = null;
+                    activity.match_tries--;
+                    Log.d(activity.TAG,"AmatchMovieActivity.handleMessage() match_tries: " + activity.match_tries + " found_ms: " + found_ms);
+                    if(!(found_ms > 0)) {
+                        // not found
+                        if( activity.match_tries > 0 ) {
+                            s = "Not found " + activity.match_tries + ". Do second try";
+                            Log.d(activity.TAG,s);
+                            //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                            activity.do_sync();
+                        } else {
+                            s = String.format(activity.getString(R.string.amatch_not_found_fmt),
+                                    calculated_search_duration_ms/1000.0);
+                            activity.mv_found_display_view.setText(s);
+                        }
                     } else {
-                        s = String.format(getString(R.string.amatch_not_found_fmt),
-                        search_duration_ms/1000.0);   
-                        mv_found_display_view.setText(s);
+                        // found
+                        s = String.format(activity.getString(R.string.amatch_found_fmt),
+                                found_ms/1000.0, calculated_search_duration_ms/1000.0);
+                        activity.mv_found_display_view.setText(s);
                     }
-                } else {
-                    // found
-                    s = String.format(getString(R.string.amatch_found_fmt), 
-                    found_ms/1000.0, search_duration_ms/1000.0); 
-                    mv_found_display_view.setText(s);  
+                    Log.d(activity.TAG, "OGG found ms: " + System.currentTimeMillis() + String.format(activity.getString(R.string.amatch_found_fmt),
+                            found_ms/1000.0, calculated_search_duration_ms/1000.0));
+
                 }
-                
             }
         }
-    };
+    }
+
+    private final FoundDisplayHandler mv_found_display_view_handler = new FoundDisplayHandler(this);
+
+//
+//    Handler mv_found_display_view_handler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            Bundle bundle = msg.getData();
+//            long found_ms = bundle.getLong("found_ms");
+//            long search_duration_ms = bundle.getLong("search_duration_ms");
+//            long calculated_search_duration_ms = System.currentTimeMillis() - start_sync_ms;
+//            Log.d(TAG, String.format("OGG calculated_search_duration_ms: %d search_duration_ms: %d", calculated_search_duration_ms, search_duration_ms));
+//            if(mv_found_display_view != null) {
+//                String s = null;
+//                match_tries--;
+//                Log.d(TAG,"AmatchMovieActivity.handleMessage() match_tries: " + match_tries + " found_ms: " + found_ms);
+//                if(!(found_ms > 0)) {
+//                    // not found
+//                    if( match_tries > 0 ) {
+//                        s = "Not found " + match_tries + ". Do second try";
+//                        Log.d(TAG,s);
+//                        //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+//                        do_sync();
+//                    } else {
+//                        s = String.format(getString(R.string.amatch_not_found_fmt),
+//                        calculated_search_duration_ms/1000.0);
+//                        mv_found_display_view.setText(s);
+//                    }
+//                } else {
+//                    // found
+//                    s = String.format(getString(R.string.amatch_found_fmt),
+//                    found_ms/1000.0, calculated_search_duration_ms/1000.0);
+//                    mv_found_display_view.setText(s);
+//                }
+//                Log.d(TAG, "OGG found ms: " + System.currentTimeMillis() + String.format(getString(R.string.amatch_found_fmt),
+//                        found_ms/1000.0, calculated_search_duration_ms/1000.0));
+//
+//            }
+//        }
+//    };
        
     Handler mv_seekbar_handler = new Handler() {
         @Override
@@ -247,7 +303,7 @@ public class AmatchMovieActivity extends Activity {
 
     public void do_sync()
     {
-        Log.d(TAG,"AmatchMovieActivity.do_sync()");
+        Log.d(TAG,"AmatchMovieActivity.do_sync() OGG ms: " + System.currentTimeMillis());
         if(!gs.amatch.isMediaPlayerReady)
         {
             Log.d(TAG,"do_sync(): MediaPlayer still not Ready.");
@@ -268,6 +324,7 @@ public class AmatchMovieActivity extends Activity {
     public void btn_start_searchClick(View view)
 	{
         match_tries = MAX_SYNC_TRIES;
+        start_sync_ms = System.currentTimeMillis();
 		do_sync();
 	}
 
